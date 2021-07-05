@@ -1,0 +1,30 @@
+{
+    "run": {
+        "default": "",
+        "items": [
+            {
+                "name": "articoli-web-service",
+                "projectName": "articoli-web-service",
+                "workingDirectory": "/home/nicola/Documents/Java/Udemy/Spring Cloud 2/articoli-web-service",
+                "args": [],
+                "vmargs": [],
+                "env": {},
+                "preLaunchTask": ""
+            }
+        ]
+    },
+    "debug": {
+        "default": "",
+        "items": [
+            {
+                "name": "articoli-web-service",
+                "projectName": "articoli-web-service",
+                "workingDirectory": "/home/nicola/Documents/Java/Udemy/Spring Cloud 2/articoli-web-service",
+                "args": [],
+                "vmargs": [],
+                "env": {},
+                "preLaunchTask": ""
+            }
+        ]
+    }
+}
