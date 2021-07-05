@@ -1,15 +1,14 @@
 package com.xantrix.webapp.exception;
 
-import java.util.Date;
-
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
-public class ErrorResponse
-{
-	
-	private Date data = new Date();
-	private int codice;
-	private String messaggio;
-	
+public class ErrorResponse {
+
+    private Date data = new Date();
+    private int codice;
+    private String messaggio;
+
 }
