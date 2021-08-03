@@ -25,7 +25,7 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/api/articoli")
 @Slf4j
-@Api(value = "alphashop", tags = "Controller Operazioni di gestione dati articoli")
+@Api(value = "Alphashop", tags = "Controller Operazioni di gestione dati articoli")
 public class ArticoliController {
 
     public static final String BARCODE_NOT_FOUND = "Il barcode %s non è stato trovato!";
