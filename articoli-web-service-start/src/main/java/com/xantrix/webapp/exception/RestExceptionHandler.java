@@ -10,46 +10,41 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @ControllerAdvice
 @RestController
-public class RestExceptionHandler extends
-        ResponseEntityExceptionHandler {
+public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+
     @ExceptionHandler(NotFoundException.class)
     public final ResponseEntity<ErrorResponse> exceptionNotFoundHandler(Exception ex) {
-        ErrorResponse errore = new ErrorResponse();
-
-        errore.setCodice(HttpStatus.NOT_FOUND.value());
-        errore.setMessaggio(ex.getMessage());
-
-        return new ResponseEntity<ErrorResponse>(errore, new HttpHeaders(), HttpStatus.NOT_FOUND);
+        ErrorResponse errore = ErrorResponse.builder()
+                .codice(HttpStatus.NOT_FOUND.value())
+                .messaggio(ex.getMessage())
+                .build();
+        return new ResponseEntity<>(errore, new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(BindingException.class)
     public ResponseEntity<ErrorResponse> exceptionBindingHandler(Exception ex) {
-        ErrorResponse errore = new ErrorResponse();
-
-        errore.setCodice(HttpStatus.BAD_REQUEST.value());
-        errore.setMessaggio(ex.getMessage());
-
-        return new ResponseEntity<ErrorResponse>(errore, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        ErrorResponse errore = ErrorResponse.builder()
+                .codice(HttpStatus.BAD_REQUEST.value())
+                .messaggio(ex.getMessage())
+                .build();
+        return new ResponseEntity<>(errore, new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(DuplicateException.class)
     public ResponseEntity<ErrorResponse> exceptionDeplicateRecordHandler(Exception ex) {
-        ErrorResponse errore = new ErrorResponse();
-
-        errore.setCodice(HttpStatus.NOT_ACCEPTABLE.value());
-        errore.setMessaggio(ex.getMessage());
-
-        return new ResponseEntity<ErrorResponse>(errore, HttpStatus.NOT_ACCEPTABLE);
+        ErrorResponse errore = ErrorResponse.builder()
+                .codice(HttpStatus.NOT_ACCEPTABLE.value())
+                .messaggio(ex.getMessage())
+                .build();
+        return new ResponseEntity<>(errore, HttpStatus.NOT_ACCEPTABLE);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> exceptionHandler(Exception ex) {
-        ErrorResponse errore = new ErrorResponse();
-
-        errore.setMessaggio("La richiesta non può essere eseguita a causa di un errore generico");
-        errore.setCodice(HttpStatus.BAD_REQUEST.value());
-
-        return new ResponseEntity<ErrorResponse>(errore, HttpStatus.BAD_REQUEST);
+        ErrorResponse errore = ErrorResponse.builder()
+                .codice(HttpStatus.BAD_REQUEST.value())
+                .messaggio("La richiesta non può essere eseguita a causa di un errore generico")
+                .build();
+        return new ResponseEntity<>(errore, HttpStatus.BAD_REQUEST);
     }
-
 }

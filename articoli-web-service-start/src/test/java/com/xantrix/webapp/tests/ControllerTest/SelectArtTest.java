@@ -18,6 +18,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.io.IOException;
 
+import static com.xantrix.webapp.controller.ArticoliController.BARCODE_NOT_FOUND;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -38,9 +39,9 @@ public class SelectArtTest {
                 .build();
     }
 
-    private String ApiBaseUrl = "/api/articoli";
+    private String apiBaseUrl = "/api/articoli";
 
-    String JsonData =
+    String jsonData =
             "{\n" +
                     "    \"codArt\": \"002000301\",\n" +
                     "    \"descrizione\": \"ACQUA ULIVETO 15 LT\",\n" +
@@ -72,7 +73,7 @@ public class SelectArtTest {
     @Test
     @Order(1)
     public void testListArtByEan() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get(ApiBaseUrl + "/cerca/ean/8008490000021")
+        mockMvc.perform(MockMvcRequestBuilders.get(apiBaseUrl + "/cerca/ean/8008490000021")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -116,53 +117,53 @@ public class SelectArtTest {
                 .andDo(print());
     }
 
-    private String Barcode = "8008490002138";
+    private String barCode = "8008490002138";
 
     @Test
     @Order(2)
     public void testErrlistArtByEan() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get(ApiBaseUrl + "/cerca/ean/" + Barcode)
+        mockMvc.perform(MockMvcRequestBuilders.get(apiBaseUrl + "/cerca/ean/" + barCode)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonData)
+                .content(jsonData)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.codice").value(404))
-                .andExpect(jsonPath("$.messaggio").value("Il barcode " + Barcode + " non è stato trovato!"))
+                .andExpect(jsonPath("$.messaggio").value(String.format(BARCODE_NOT_FOUND, barCode)))
                 .andDo(print());
     }
 
     @Test
     @Order(3)
     public void testListArtByCodArt() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get(ApiBaseUrl + "/cerca/codice/002000301")
+        mockMvc.perform(MockMvcRequestBuilders.get(apiBaseUrl + "/cerca/codice/002000301")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(JsonData))
+                .andExpect(content().json(jsonData))
                 .andReturn();
     }
 
-    private String CodArt = "002000301b";
+    private String codArt = "002000301b";
 
     @Test
     @Order(4)
     public void testErrlistArtByCodArt() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get(ApiBaseUrl + "/cerca/codice/" + CodArt)
+        mockMvc.perform(MockMvcRequestBuilders.get(apiBaseUrl + "/cerca/codice/" + codArt)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonData)
+                .content(jsonData)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.codice").value(404))
-                .andExpect(jsonPath("$.messaggio").value("L'articolo con codice " + CodArt + " non è stato trovato!"))
+                .andExpect(jsonPath("$.messaggio").value("L'articolo con codice " + codArt + " non è stato trovato!"))
                 .andDo(print());
     }
 
-    private String JsonData2 = "[" + JsonData + "]";
+    private String JsonData2 = "[" + jsonData + "]";
 
     @Test
     @Order(5)
     public void testListArtByDesc() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get(ApiBaseUrl + "/cerca/descrizione/ACQUA ULIVETO 15 LT")
+        mockMvc.perform(MockMvcRequestBuilders.get(apiBaseUrl + "/cerca/descrizione/ACQUA ULIVETO 15 LT")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
@@ -176,7 +177,7 @@ public class SelectArtTest {
     public void testErrlistArtByDesc() throws Exception {
         String Filter = "123ABC";
 
-        mockMvc.perform(MockMvcRequestBuilders.get(ApiBaseUrl + "/cerca/descrizione/" + Filter)
+        mockMvc.perform(MockMvcRequestBuilders.get(apiBaseUrl + "/cerca/descrizione/" + Filter)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.codice").value(404))

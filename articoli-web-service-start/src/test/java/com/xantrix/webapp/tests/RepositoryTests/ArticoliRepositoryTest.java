@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest()
@@ -29,17 +30,17 @@ public class ArticoliRepositoryTest {
 
     @Test
     @Order(1)
-    public void TestInsArticolo() {
+    public void testInsArticolo() {
         Articoli articolo = new Articoli("123Test", "Articolo di Test", 6, 1.75, "1");
 
         FamAssort famAssort = new FamAssort();
         famAssort.setId(1);
         articolo.setFamAssort(famAssort);
 
-        Set<Barcode> Eans = new HashSet<>();
-        Eans.add(new Barcode("12345678", "CP", articolo));
+        Set<Barcode> eans = new HashSet<>();
+        eans.add(new Barcode("12345678", "CP", articolo));
 
-        articolo.setBarcode(Eans);
+        articolo.setBarcode(eans);
 
         articoliRepository.save(articolo);
 
@@ -50,28 +51,23 @@ public class ArticoliRepositoryTest {
 
     @Test
     @Order(2)
-    public void TestSelByDescrizioneLike() {
+    public void testSelByDescrizioneLike() {
         List<Articoli> items = articoliRepository.findByDescrizioneLike("Articolo di Test");
         assertEquals(1, items.size());
     }
 
     @Test
     @Order(3)
-    public void TestfindByEan() throws Exception {
-        assertThat(articoliRepository.SelByEan("12345678"))
+    public void testFindByEan() throws Exception {
+        assertThat(articoliRepository.selByEan("12345678"))
                 .extracting(Articoli::getDescrizione)
                 .isEqualTo("Articolo di Test");
-
     }
 
     @Test
     @Order(4)
-    public void TestDelArticolo() {
+    public void testDelArticolo() {
         Articoli articolo = articoliRepository.findByCodArt("123Test");
-
         articoliRepository.delete(articolo);
-
     }
-
-
 }

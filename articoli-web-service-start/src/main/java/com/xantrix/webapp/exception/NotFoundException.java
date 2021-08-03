@@ -21,5 +21,4 @@ public class NotFoundException extends Exception {
     public void setMessaggio(String messaggio) {
         this.messaggio = messaggio;
     }
-
 }

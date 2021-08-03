@@ -8,9 +8,9 @@ server:
 spring:
   application:
     name: ProductsWebService
-  # ==============================================================
-  # = DBMS PostgreSQL Parameters
-  # ==============================================================
+# ==============================================================
+# = DBMS PostgreSQL Parameters
+# ==============================================================
   datasource:
     initialization-mode: always
     password: 123_Stella
@@ -23,6 +23,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
         jdbc:
           lob:
             non_contextual_creation: true

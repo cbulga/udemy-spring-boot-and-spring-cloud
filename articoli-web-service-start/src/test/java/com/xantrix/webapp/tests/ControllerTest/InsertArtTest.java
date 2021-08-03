@@ -1,6 +1,8 @@
 package com.xantrix.webapp.tests.ControllerTest;
 
 import com.xantrix.webapp.Application;
+import com.xantrix.webapp.entities.Articoli;
+import com.xantrix.webapp.repository.ArticoliRepository;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -18,6 +20,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.io.IOException;
 
+import static com.xantrix.webapp.controller.ArticoliController.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -26,6 +30,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @TestMethodOrder(OrderAnnotation.class)
 public class InsertArtTest {
+
+    @Autowired
+    private ArticoliRepository articoliRepository;
 
     private MockMvc mockMvc;
 
@@ -77,8 +84,9 @@ public class InsertArtTest {
                 .content(JsonData)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
+                .andDo(print())
                 .andExpect(jsonPath("$.code").value("200 OK"))
-                .andExpect(jsonPath("$.message").value("Inserimento Articolo 123Test Eseguita Con Successo"))
+                .andExpect(jsonPath("$.message").value(String.format(INSERIMENTO_ARTICOLO_ESEGUITO_CON_SUCCESSO, "123Test")))
 
                 .andDo(print());
 
@@ -96,7 +104,7 @@ public class InsertArtTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotAcceptable())
                 .andExpect(jsonPath("$.codice").value(406))
-                .andExpect(jsonPath("$.messaggio").value("Articolo 123Test presente in anagrafica! Impossibile utilizzare il metodo POST"))
+                .andExpect(jsonPath("$.messaggio").value(String.format(ARTICOLO_DUPLICATO_IMPOSSIBILE_UTILIZZARE_IL_METODO_POST, "123Test")))
                 .andDo(print());
     }
 
@@ -172,7 +180,6 @@ public class InsertArtTest {
     @Test
     @Order(4)
     public void testUpdArticolo() throws Exception {
-
         mockMvc.perform(MockMvcRequestBuilders.put(ApiBaseUrl + "/modifica")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonDataMod)
@@ -185,7 +192,6 @@ public class InsertArtTest {
         assertThat(articoliRepository.findByCodArt("123Test"))
                 .extracting(Articoli::getIdStatoArt)
                 .isEqualTo("2");
-
     }
 
     String ErrJsonDataMod =
@@ -236,7 +242,7 @@ public class InsertArtTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("200 OK"))
-                .andExpect(jsonPath("$.message").value("Eliminazione Articolo 123Test Eseguita Con Successo"))
+                .andExpect(jsonPath("$.message").value(String.format(ELIMINAZIONE_ARTICOLO_ESEGUITA_CON_SUCCESSO, "123Test")))
                 .andDo(print());
     }
 
@@ -249,8 +255,7 @@ public class InsertArtTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.codice").value(404))
-                .andExpect(jsonPath("$.messaggio").value("Articolo 123Test non presente in anagrafica!"))
+                .andExpect(jsonPath("$.messaggio").value(String.format(ARTICOLO_NON_PRESENTE_IN_ANAGRAFICA, "123Test")))
                 .andDo(print());
     }
-
 }
