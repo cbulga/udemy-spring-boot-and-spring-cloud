@@ -28,7 +28,8 @@ spring:
           lob:
             non_contextual_creation: true
     show-sql: true
-    
-
-  
-
+logging:
+  level:
+    com:
+      xantrix:
+        DEBUG
