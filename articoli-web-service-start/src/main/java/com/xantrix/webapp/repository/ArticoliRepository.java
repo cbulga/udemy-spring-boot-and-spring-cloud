@@ -8,15 +8,15 @@ import org.springframework.data.repository.query.Param;
 
 import com.xantrix.webapp.entities.Articoli;
 
-public interface ArticoliRepository extends JpaRepository<Articoli,String>
-{
-	Articoli findByCodArt(String codArt);
-	
-	List<Articoli> findByDescrizioneLike(String descrizione);
-	
-	//JPQL
-	@Query(value="SELECT a FROM Articoli a JOIN a.barcode b WHERE b.barcode IN (:ean)")
-	Articoli selByEan(@Param("ean") String ean);
+public interface ArticoliRepository extends JpaRepository<Articoli, String> {
+
+    Articoli findByCodArt(String codArt);
+
+    List<Articoli> findByDescrizioneLike(String descrizione);
+
+    //JPQL
+    @Query(value = "SELECT a FROM Articoli a JOIN a.barcode b WHERE b.barcode IN (:ean)")
+    Articoli selByEan(@Param("ean") String ean);
 	
 	/*
 	//SQL

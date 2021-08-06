@@ -39,6 +39,12 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+	<!-- Security -->
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-security</artifactId>
+	</dependency>
+
         <!-- Binding Validation -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -108,6 +114,12 @@
             <version>1.7.2</version>
             <scope>test</scope>
         </dependency>
+
+	<dependency>
+	    <groupId>org.springframework.security</groupId>
+	    <artifactId>spring-security-test</artifactId>
+	    <scope>test</scope>
+	</dependency>
     </dependencies>
 
     <build>
