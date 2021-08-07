@@ -1,0 +1,8 @@
+version: '2.1'
+
+services:
+  gestuser:
+    image: gestuser
+    build: .
+    ports:
+      - 8019:8019

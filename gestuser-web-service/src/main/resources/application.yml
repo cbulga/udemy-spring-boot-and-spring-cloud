@@ -1,0 +1,20 @@
+# ==============================================================
+# = GestUser - Servizio Gestione Utenti 
+# ==============================================================
+
+server:
+  port: 8019
+spring:
+  application:
+    name: GestUser
+# ==============================================================
+# = MONGODB Parameters
+# ==============================================================
+  data:
+    mongodb:
+      authentication-database: admin
+      database: ms-users
+      host: localhost
+      password: 123Stella
+      port: 37017
+      username: cristian

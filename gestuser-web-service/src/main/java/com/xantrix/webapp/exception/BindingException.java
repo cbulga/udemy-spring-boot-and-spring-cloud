@@ -14,3 +14,4 @@ public class BindingException extends Exception {
     private static final long serialVersionUID = -1646083143194195402L;
     private String messaggio;
 }
+

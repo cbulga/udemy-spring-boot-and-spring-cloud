@@ -1,0 +1,14 @@
+version: '2.1'
+
+services:
+  gestuser:
+    image: gestuser
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      JAVA_OPTS: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005,quiet=y
+    ports:
+      - 8019:8019
+      - 5005:5005
+    
