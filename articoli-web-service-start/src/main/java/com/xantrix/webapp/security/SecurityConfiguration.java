@@ -1,5 +1,7 @@
 package com.xantrix.webapp.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -24,6 +26,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     public static final String ADMIN_ROLE = "ADMIN";
     public static final String USER_ROLE = "USER";
     private static final String REALM = "REAME";
+
+    private final CustomUserDetailsService userDetailsService;
+
+    public SecurityConfiguration(@Qualifier("customUserDetailsService") CustomUserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -55,7 +63,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private AuthEntryPoint getBasicAuthEntryPoint() {
         return new AuthEntryPoint();
     }
-
+/*
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
@@ -64,5 +72,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .withUser("user").password(new BCryptPasswordEncoder().encode("password")).roles("USER")
                 .and()
                 .withUser("admin").password(new BCryptPasswordEncoder().encode("password")).roles("USER", "ADMIN");
+    }
+ */
+
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService)
+                .passwordEncoder(passwordEncoder());
     }
 }
