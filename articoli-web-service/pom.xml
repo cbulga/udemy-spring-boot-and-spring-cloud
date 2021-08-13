@@ -39,11 +39,18 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-	<!-- Security -->
-	<dependency>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-security</artifactId>
-	</dependency>
+        <!-- Security -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!-- JWT -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.9.1</version>
+        </dependency>
 
         <!-- Binding Validation -->
         <dependency>
@@ -115,11 +122,11 @@
             <scope>test</scope>
         </dependency>
 
-	<dependency>
-	    <groupId>org.springframework.security</groupId>
-	    <artifactId>spring-security-test</artifactId>
-	    <scope>test</scope>
-	</dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

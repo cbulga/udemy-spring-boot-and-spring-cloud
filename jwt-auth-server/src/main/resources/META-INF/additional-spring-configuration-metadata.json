@@ -1,0 +1,49 @@
+{
+  "properties": [
+    {
+      "name": "gestuser.srv-url",
+      "type": "java.lang.String",
+      "description": "A description for 'gestuser.srv-url'"
+    },
+    {
+      "name": "gestuser.userId",
+      "type": "java.lang.String",
+      "description": "A description for 'gestuser.userId'"
+    },
+    {
+      "name": "gestuser.password",
+      "type": "java.lang.String",
+      "description": "A description for 'gestuser.password'"
+    },
+    {
+      "name": "sicurezza.uri",
+      "type": "java.lang.String",
+      "description": "A description for 'sicurezza.uri'"
+    },
+    {
+      "name": "sicurezza.refresh",
+      "type": "java.lang.String",
+      "description": "A description for 'sicurezza.refresh'"
+    },
+    {
+      "name": "sicurezza.header",
+      "type": "java.lang.String",
+      "description": "A description for 'sicurezza.header'"
+    },
+    {
+      "name": "sicurezza.prefix",
+      "type": "java.lang.String",
+      "description": "A description for 'sicurezza.prefix'"
+    },
+    {
+      "name": "sicurezza.expiration",
+      "type": "java.lang.String",
+      "description": "A description for 'sicurezza.expiration'"
+    },
+    {
+      "name": "sicurezza.secret",
+      "type": "java.lang.String",
+      "description": "A description for 'sicurezza.secret'"
+    }
+  ]
+}
