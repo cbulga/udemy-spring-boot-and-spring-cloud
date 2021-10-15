@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.xantrix.webapp</groupId>
-    <artifactId>gestuser</artifactId>
+    <artifactId>gestuser-web-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>gestuser</name>
+    <name>gestuser-web-service</name>
     <description>Servizio Gestione Utenti</description>
     <packaging>jar</packaging>
     <properties>

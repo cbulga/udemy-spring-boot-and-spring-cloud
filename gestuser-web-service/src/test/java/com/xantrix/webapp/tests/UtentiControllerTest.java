@@ -169,29 +169,29 @@ public class UtentiControllerTest {
                 .isEqualTo(true);
     }
 
-    @Test
-    @Order(5)
-    public void testDelUtente1() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/utenti/elimina/Cristian")
-                        .characterEncoding(StandardCharsets.UTF_8.toString())
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("200 OK"))
-                .andExpect(jsonPath("$.message").value("Eliminazione Utente Cristian Eseguita Con Successo"))
-                .andDo(print());
-    }
-
-    @Test
-    @Order(6)
-    public void testDelUtente2() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/utenti/elimina/Admin")
-                        .characterEncoding(StandardCharsets.UTF_8.toString())
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("200 OK"))
-                .andExpect(jsonPath("$.message").value("Eliminazione Utente Admin Eseguita Con Successo"))
-                .andDo(print());
-    }
+//    @Test
+//    @Order(5)
+//    public void testDelUtente1() throws Exception {
+//        mockMvc.perform(MockMvcRequestBuilders.delete("/api/utenti/elimina/Cristian")
+//                        .characterEncoding(StandardCharsets.UTF_8.toString())
+//                        .accept(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.code").value("200 OK"))
+//                .andExpect(jsonPath("$.message").value("Eliminazione Utente Cristian Eseguita Con Successo"))
+//                .andDo(print());
+//    }
+//
+//    @Test
+//    @Order(6)
+//    public void testDelUtente2() throws Exception {
+//        mockMvc.perform(MockMvcRequestBuilders.delete("/api/utenti/elimina/Admin")
+//                        .characterEncoding(StandardCharsets.UTF_8.toString())
+//                        .accept(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.code").value("200 OK"))
+//                .andExpect(jsonPath("$.message").value("Eliminazione Utente Admin Eseguita Con Successo"))
+//                .andDo(print());
+//    }
 }
 
 

@@ -1,0 +1,56 @@
+# accedere alla bash del container mongodb con il seguente comando:
+docker exec -it mongodb bash
+# editare il file di configurazione di mongodb per abilitare la sicurezza
+nano /etc/mongodb.conf
+# all'interno del file:
+# - modificare il bind_up = 127.0.0.1 in bind_ip = 0.0.0.0
+# - decommentare auth = true
+# riavviare il container per recepire la nuova configurazione
+docker restart mongodb
+# rientrare nella bash del container mongodb
+docker exec -it mongodb bash
+# lanciamo il client mongo per connetterci al mongodb locale
+mongo
+# selezioniamo il db di admin
+use admin
+# creiamo un utente admin con la seguente sintassi
+db.createUser({
+    user: "admin",
+    pwd: "123_Stella",
+    roles: [
+        {
+            role: "userAdminAnyDatabase",
+            db: "admin"
+        }
+    ]
+})
+# usciamo da mongo
+exit
+# usciamo dal container mongodb
+exit
+# ci connettiamo al container mongodb da fuori, sulla porta 37017 (e non quella di default 27017) con il seguente comando
+mongo -u admin --authenticationDatabase admin -p --port 37017
+# selezioniamo il db admin
+use admin
+# creiamo un nuovo utente cristian con accesso in lettura/scrittura al db ms-users
+db.createUser({
+    user: "cristian",
+    pwd: "123Stella",
+    roles: [
+        {
+            role: "readWrite",
+            db: "ms-users"
+        }
+    ]
+})
+# disconnettiamoci dal mongodb come admin
+exit
+# riconnettiamoci come cristian
+mongo -u cristian --authenticationDatabase admin -p --port 37017
+# creiamo il db ms-users
+use ms-users
+# per creare velocemente gli utenti nel db ms-users:
+# - aprire UtentiControllerTest
+# - commentare i metodi di test testDelUtente2 e testDelUtente1
+# - eseguire la classe di test
+# - decommentare i metodi precedentemente commentati

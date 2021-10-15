@@ -67,7 +67,7 @@ public class JWTWebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().authenticationEntryPoint(jwtAuthorizedResponseAuthenticationEntryPoint)
                 .and()
                 .authorizeRequests()
-                .antMatchers(NOAUTH_MATCHER).permitAll() // endpoint che non richiede autenticazione
+//                .antMatchers(NOAUTH_MATCHER).permitAll() // endpoint che non richiede autenticazione
                 .antMatchers(USER_MATCHER).hasAnyRole("USER")
                 .antMatchers(ADMIN_MATCHER).hasAnyRole("ADMIN")
                 .anyRequest().authenticated();

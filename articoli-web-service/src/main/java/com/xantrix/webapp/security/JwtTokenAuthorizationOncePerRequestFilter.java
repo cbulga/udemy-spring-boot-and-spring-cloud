@@ -24,13 +24,14 @@ public class JwtTokenAuthorizationOncePerRequestFilter extends OncePerRequestFil
 
     private final UserDetailsService userDetailsService;
     private final JwtTokenUtil jwtTokenUtil;
-    @Value("${sicurezza.header}")
-    private String tokenHeader;
+    private final String tokenHeader;
 
     public JwtTokenAuthorizationOncePerRequestFilter(@Qualifier("customUserDetailsService") UserDetailsService userDetailsService,
-                                                     JwtTokenUtil jwtTokenUtil) {
+                                                     JwtTokenUtil jwtTokenUtil,
+                                                     @Value("${sicurezza.header}") String tokenHeader) {
         this.userDetailsService = userDetailsService;
         this.jwtTokenUtil = jwtTokenUtil;
+        this.tokenHeader = tokenHeader;
     }
 
     @Override
