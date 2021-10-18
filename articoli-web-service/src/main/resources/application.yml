@@ -7,11 +7,12 @@ server:
 # ==============================================================
 # = Impostazione SSL
 # ==============================================================
-  ssl:
-    enabled: true
-    key-store-type: PKCS12
-    key-store: classpath:ssl-server.jks
-    key-store-password: 123_Stella
+# SSL DISABILITATO PER ORA...
+#  ssl:
+#    enabled: true
+#    key-store-type: PKCS12
+#    key-store: classpath:ssl-server.jks
+#    key-store-password: 123_Stella
 
 spring:
   application:
@@ -36,11 +37,32 @@ spring:
           lob:
             non_contextual_creation: true
     show-sql: true
+
+# ==============================================================
+# = Proprietà Livello Log
+# = Default ERROR, WARN e INFO
+# = Levels: TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF
+# ==============================================================
 logging:
+  file:
+    name: "/home/cristian/tmp/Udemy/spring-cloud-course/logs/ArtSrv.log"
+  pattern:
+    file: "%d{ dd-MM-yyyy } [%thread] %-5level %logger{36} - %msg%n"
+    console: "%d{dd-MM-yyyy HH:mm:ss} - %msg%n"
+
+  logback:
+    rollingpolicy:
+      max-file-size: 1MB
+  # Livello del log generale
   level:
-    com:
-      xantrix:
-        DEBUG
+    root: WARN
+#    com:
+#      xantrix:
+#        DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate: INFO
+    org.springframework.web: INFO
+    com.xantrix.webapp: DEBUG
 
 # Opzioni accesso servizio gestUser
 gestuser:
