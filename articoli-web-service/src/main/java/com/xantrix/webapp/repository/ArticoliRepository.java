@@ -17,7 +17,9 @@ public interface ArticoliRepository extends JpaRepository<Articoli, String> {
     //JPQL
     @Query(value = "SELECT a FROM Articoli a JOIN a.barcode b WHERE b.barcode IN (:ean)")
     Articoli selByEan(@Param("ean") String ean);
-	
+
+    long count();
+
 	/*
 	//SQL
 	@Query(value = "SELECT * FROM articoli a JOIN barcode b ON a.codart = b.codart WHERE b.barcode = :ean", nativeQuery = true )

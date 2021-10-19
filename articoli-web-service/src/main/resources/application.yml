@@ -3,7 +3,7 @@
 # ==============================================================
 
 server:
-  port: 5443
+  port: 5051
 # ==============================================================
 # = Impostazione SSL
 # ==============================================================
@@ -37,6 +37,32 @@ spring:
           lob:
             non_contextual_creation: true
     show-sql: true
+
+# ==============================================================
+# = Actuator Parameters
+# ==============================================================
+management:
+  info:
+    git:
+      mode: full
+  endpoint:
+    health:
+      show-details: WHEN_AUTHORIZED
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+# ==============================================================
+# = Actuator Info
+# ==============================================================
+info:
+  assistenza:
+    nome: "Cristian Bulgarelli"
+    mail: "cristian.bulgarelli@gmail.com"
+    telefono: "3489227531"
+    orario: "9-18"
+  nome:
+    nome-app: "Articoli Web Service - Versione Autenticazione JWT"
 
 # ==============================================================
 # = Proprietà Livello Log
