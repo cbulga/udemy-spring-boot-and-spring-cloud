@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Component used by actuator info endpoint.
  */
-@Component
+//@Component
 public class ArtInfoContributor implements InfoContributor {
 
     private final ArticoliRepository articoliRepository;
