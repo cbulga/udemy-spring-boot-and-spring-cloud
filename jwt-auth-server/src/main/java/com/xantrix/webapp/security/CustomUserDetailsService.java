@@ -50,10 +50,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         return builder.build();
     }
 
-    private Utenti getHttpValue(String UserId) {
+    private Utenti getHttpValue(String userId) {
         URI url;
         try {
-            url = new URI(config.getSrvUrl() + UserId);
+            url = new URI(config.getSrvUrl() + userId);
         } catch (URISyntaxException ex) {
             throw new RuntimeException("Error using the gestUser ws url", ex);
         }

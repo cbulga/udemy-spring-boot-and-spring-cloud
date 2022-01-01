@@ -3,7 +3,7 @@ docker exec -it mongodb bash
 # editare il file di configurazione di mongodb per abilitare la sicurezza
 nano /etc/mongodb.conf
 # all'interno del file:
-# - modificare il bind_up = 127.0.0.1 in bind_ip = 0.0.0.0
+# - modificare il bind_ip = 127.0.0.1 in bind_ip = 0.0.0.0
 # - decommentare auth = true
 # riavviare il container per recepire la nuova configurazione
 docker restart mongodb
