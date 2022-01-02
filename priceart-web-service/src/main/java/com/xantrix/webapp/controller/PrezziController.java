@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.xantrix.webapp.appconf.AppConfig;
 import com.xantrix.webapp.entity.DettListini;
 import com.xantrix.webapp.service.PrezziService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.swagger.annotations.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,9 +17,11 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/prezzi")
+@Slf4j
+@Api(value = "alphashop", tags = "Controller Operazioni di ottenimento e eliminazione prezzo articolo")
+@ApiOperation(value = "", authorizations = {@Authorization(value = "jwtToken")})
 public class PrezziController {
 
-    private static final Logger logger = LoggerFactory.getLogger(PrezziController.class);
     private final PrezziService prezziService;
     private final AppConfig config;
 
@@ -28,22 +30,52 @@ public class PrezziController {
         this.config = config;
     }
 
+    // ------------------- SELECT PREZZO CODART SENZA AUTENTICAZIONE ------------------------------------
+    @GetMapping(value = {"/noauth/{codart}/{idlist}", "noauth/{codart}"})
+    public double getPriceCodArtNoAuth(@PathVariable("codart") String codArt,
+                                       @PathVariable("idlist") Optional<String> optIdList) {
+        double retVal = 0;
+
+        String idList = optIdList.orElseGet(config::getListino);
+
+        log.info("Listino di Riferimento: {}", idList);
+
+        DettListini prezzo = prezziService.selPrezzo(codArt, idList);
+
+        if (prezzo != null) {
+            log.info("Prezzo Articolo: " + prezzo.getPrezzo());
+            retVal = prezzo.getPrezzo();
+        } else {
+            log.warn("Prezzo Articolo Assente!!");
+        }
+
+        return retVal;
+    }
+
     // ------------------- SELECT PREZZO CODART ------------------------------------
+    @ApiOperation(
+            value = "Ricerca il PREZZO dell'articolo selezionato",
+            notes = "pprevede il parametro opzionale idlist",
+            response = Double.class,
+            produces = "application/json")
+    @ApiResponses(value =
+            {@ApiResponse(code = 200, message = "Il Prezzo è stato trovato!"),
+            })
     @GetMapping(value = {"/{codart}/{idlist}", "/{codart}"})
     public double getPriceCodArt(@PathVariable("codart") String codArt, @PathVariable("idlist") Optional<String> optIdList) {
         double retVal = 0;
 
         String idList = optIdList.orElseGet(config::getListino);
 
-        logger.info("Listino di Riferimento: " + idList);
+        log.info("Listino di Riferimento: " + idList);
 
         DettListini prezzo = prezziService.selPrezzo(codArt, idList);
 
         if (prezzo != null) {
-            logger.info("Prezzo Articolo: " + prezzo.getPrezzo());
+            log.info("Prezzo Articolo: {}", prezzo.getPrezzo());
             retVal = prezzo.getPrezzo();
         } else
-            logger.warn("Prezzo Articolo Assente!!");
+            log.warn("Prezzo Articolo Assente!!");
 
         return retVal;
     }
@@ -51,7 +83,7 @@ public class PrezziController {
     // ------------------- DELETE PREZZO LISTINO ------------------------------------
     @RequestMapping(value = "/elimina/{codart}/{idlist}", method = RequestMethod.DELETE)
     public ResponseEntity<?> deletePrice(@PathVariable("codart") String codArt, @PathVariable("idlist") String idList) {
-        logger.info(String.format("Eliminazione prezzo listino %s dell'articolo %s", idList, codArt));
+        log.info(String.format("Eliminazione prezzo listino %s dell'articolo %s", idList, codArt));
 
         HttpHeaders headers = new HttpHeaders();
         ObjectMapper mapper = new ObjectMapper();
@@ -65,7 +97,7 @@ public class PrezziController {
         responseNode.put("code", HttpStatus.OK.toString());
         responseNode.put("message", "Eliminazione Prezzo Eseguita Con Successo");
 
-        logger.info("Eliminazione Prezzo Eseguita Con Successo");
+        log.info("Eliminazione Prezzo Eseguita Con Successo");
 
         return new ResponseEntity<>(responseNode, headers, HttpStatus.OK);
     }

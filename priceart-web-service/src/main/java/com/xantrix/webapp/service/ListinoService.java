@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface ListinoService {
 
-    Optional<Listini> selById(String Id);
+    Optional<Listini> selById(String id);
 
     void insListino(Listini listino);
 

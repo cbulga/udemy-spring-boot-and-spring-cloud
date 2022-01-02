@@ -23,6 +23,27 @@ spring:
           lob:
             non_contextual_creation: true
     show-sql: true
+    
+# ==============================================================
+# = Actuator Parameters
+# ==============================================================
+management:
+  endpoint:
+    health:
+      show-details: WHEN_AUTHORIZED
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+        
+# ==============================================================
+# = Actuator Info
+# ==============================================================
+info:
+  assistenza:
+    nome: "Cristian Bulgarelli"
+  nome:
+    nome-app: "PriceArt Web Service - Versione Autenticazione JWT"
 # ==============================================================
 # = Proprietà Servizio gestUser
 # ==============================================================           

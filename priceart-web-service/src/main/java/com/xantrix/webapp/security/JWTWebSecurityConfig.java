@@ -66,6 +66,18 @@ public class JWTWebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
+                .antMatchers(
+                        HttpMethod.GET,
+                        "/v2/api-docs",           // swagger
+                        "/webjars/**",            // swagger-ui webjars
+                        "/swagger-resources/**",  // swagger-ui resources
+                        "/configuration/**",      // swagger configuration
+                        "/swagger-ui.html",
+                        "/favicon.ico",
+                        "/**/*.html",
+                        "/**/*.css",
+                        "/**/*.js"
+                ).permitAll()
                 .antMatchers(NOAUTH_MATCHER).permitAll() //End Point che non richiede autenticaione
                 .antMatchers(USER_MATCHER).hasAnyRole("USER")
                 .antMatchers(ADMIN_MATCHER).hasAnyRole("ADMIN")
