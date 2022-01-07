@@ -1,0 +1,28 @@
+# ==============================================================
+# = Config Server Base
+# ==============================================================
+server:
+  port: 8888
+
+# ==============================================================
+# = Profilo Attivo
+# ==============================================================
+spring:
+  config:
+    use-legacy-processing: false
+  profiles:
+    active: git
+
+# ==============================================================
+# = Actuator Parameters
+# ==============================================================
+management:
+  endpoint:
+    health:
+      show-details: WHEN_AUTHORIZED
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+#endpoint: http://localhost:8888/{application-name}/{profile}[/{label}]

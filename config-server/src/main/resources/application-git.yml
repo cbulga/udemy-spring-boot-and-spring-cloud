@@ -1,0 +1,15 @@
+# ==============================================================
+# = Authentication Server JWT
+# = Profilo GIT
+# ==============================================================
+spring:
+  config:
+    activate:
+      on-profile: git
+  application:
+    name: config-server-git
+  cloud:
+    config:
+      server:
+        git:
+          uri: file:///home/cristian/git_repo/udemy-spring-boot-and-spring-cloud/git-config-repository

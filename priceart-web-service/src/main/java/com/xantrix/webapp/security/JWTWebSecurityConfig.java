@@ -24,18 +24,20 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class JWTWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private JwtUnAuthorizedResponseAuthenticationEntryPoint jwtUnAuthorizedResponseAuthenticationEntryPoint;
+    private final JwtUnAuthorizedResponseAuthenticationEntryPoint jwtUnAuthorizedResponseAuthenticationEntryPoint;
+    private final UserDetailsService userDetailsService;
+    private final JwtTokenAuthorizationOncePerRequestFilter jwtAuthenticationTokenFilter;
+    private final String authenticationPath;
 
-    @Autowired
-    @Qualifier("customUserDetailsService")
-    private UserDetailsService userDetailsService;
-
-    @Autowired
-    private JwtTokenAuthorizationOncePerRequestFilter jwtAuthenticationTokenFilter;
-
-    @Value("${sicurezza.uri}")
-    private String authenticationPath;
+    public JWTWebSecurityConfig(JwtUnAuthorizedResponseAuthenticationEntryPoint jwtUnAuthorizedResponseAuthenticationEntryPoint,
+                                @Qualifier("customUserDetailsService") UserDetailsService userDetailsService,
+                                JwtTokenAuthorizationOncePerRequestFilter jwtAuthenticationTokenFilter,
+                                @Value("${sicurezza.uri}") String authenticationPath) {
+        this.jwtUnAuthorizedResponseAuthenticationEntryPoint = jwtUnAuthorizedResponseAuthenticationEntryPoint;
+        this.userDetailsService = userDetailsService;
+        this.jwtAuthenticationTokenFilter = jwtAuthenticationTokenFilter;
+        this.authenticationPath = authenticationPath;
+    }
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -54,9 +56,14 @@ public class JWTWebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private static final String[] NOAUTH_MATCHER = {"/api/prezzi/noauth/**"};
-    private static final String[] USER_MATCHER = {"/api/prezzi/**", "/api/listino/cerca/**", "/info"};
-    private static final String[] ADMIN_MATCHER = {"/api/prezzi/elimina/**",
-            "/api/listino/inserisci/**", "/api/listino/elimina/**"};
+    private static final String[] USER_MATCHER = {
+            "/api/prezzi/**",
+            "/api/listino/cerca/**",
+            "/info"};
+    private static final String[] ADMIN_MATCHER = {
+            "/api/prezzi/elimina/**",
+            "/api/listino/inserisci/**",
+            "/api/listino/elimina/**"};
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
@@ -82,18 +89,15 @@ public class JWTWebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(USER_MATCHER).hasAnyRole("USER")
                 .antMatchers(ADMIN_MATCHER).hasAnyRole("ADMIN")
                 .anyRequest().authenticated();
-
         httpSecurity.addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
-
-        httpSecurity.headers().frameOptions()
-                .sameOrigin().cacheControl();
+        httpSecurity.headers().frameOptions().sameOrigin().cacheControl();
     }
 
     @Override
     public void configure(WebSecurity webSecurity) {
         webSecurity.ignoring().antMatchers(HttpMethod.POST, authenticationPath)
                 .antMatchers(HttpMethod.OPTIONS, "/**")
-                .and().ignoring()
-                .antMatchers(HttpMethod.GET, "/");
+                .and()
+                .ignoring().antMatchers(HttpMethod.GET, "/");
     }
 }
