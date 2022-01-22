@@ -3,9 +3,6 @@
 # = Profilo GIT
 # ==============================================================
 spring:
-  config:
-    activate:
-      on-profile: git
   application:
     name: config-server-git
   cloud:
@@ -13,3 +10,6 @@ spring:
       server:
         git:
           uri: file:///home/cristian/git_repo/udemy/git-config-repository
+  config:
+    activate:
+      on-profile: git

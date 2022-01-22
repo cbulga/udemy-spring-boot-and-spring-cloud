@@ -1,0 +1,19 @@
+# ==============================================================
+# = Authentication Server JWT
+# = Profilo GITHUB
+# ==============================================================
+spring:
+  config:
+    activate:
+      on-profile: github
+  application:
+    name: config-server-github
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/cbulga/udemy-spring-boot-and-spring-cloud-git-config-repository.git
+          username: cbulga
+          password: <password serve solo se repository privato, se pubblico è accessibile a chiunque>
+          cloneOnStart: true
+          timeout: 4 # in seconds

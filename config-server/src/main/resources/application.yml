@@ -11,7 +11,7 @@ spring:
   config:
     use-legacy-processing: false
   profiles:
-    active: git
+    active: github
 
 # ==============================================================
 # = Actuator Parameters
