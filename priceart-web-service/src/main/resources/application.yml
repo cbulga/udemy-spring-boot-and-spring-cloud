@@ -9,7 +9,9 @@ spring:
       # indirizzo riferimento config server
       uri: http://localhost:8888
       # profilo attivo
-      profile: list1
+      profile: list100
+      # branch git da usare da cui caricare la configurazione del config server
+      label: list3
   # ==============================================================
   # = Proprietà Fonte Dati PostgreSQL
   # ==============================================================
