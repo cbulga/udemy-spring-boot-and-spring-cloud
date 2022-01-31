@@ -34,10 +34,3 @@ logging:
   level:
     org.springframework.cloud: DEBUG
     org.springframework.security: DEBUG
-
-# ==============================================================
-# = Security Parameters
-# ==============================================================
-sicurezza:
-  userpwd: 'BimBumBam_2018'     # password utente che accede a tutti gli endpoint del config server, actuator escluso
-  adminpwd: 'MagicaBula_2018'   # password admin che accede a tutti gli endpoint del config server, actuator incluso
