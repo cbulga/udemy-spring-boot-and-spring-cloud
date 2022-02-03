@@ -1,3 +1,6 @@
+# ==============================================================
+# = PriceArt Web Service con Autenticazione JWT
+# ==============================================================
 server:
   port: 5071
 
@@ -9,9 +12,12 @@ spring:
       # indirizzo riferimento config server
       uri: http://localhost:8888
       # profilo attivo
-      profile: list100
+      profile: list1
       # branch git da usare da cui caricare la configurazione del config server
-      label: list3
+      #label: list3
+      username: user
+      password: BimBumBam_2018
+      fail-fast: true
   # ==============================================================
   # = Proprietà Fonte Dati PostgreSQL
   # ==============================================================
