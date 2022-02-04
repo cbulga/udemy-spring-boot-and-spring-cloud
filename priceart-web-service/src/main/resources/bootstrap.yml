@@ -12,11 +12,13 @@ spring:
       # indirizzo riferimento config server
       uri: http://localhost:8888
       # profilo attivo
-      profile: list1
+      profile: std
       # branch git da usare da cui caricare la configurazione del config server
       #label: list3
+      # username and password to authenticate into the config server
       username: user
       password: BimBumBam_2018
+      # if fail-fast is true, the microservice will throw an exception during startup when it does not authenticate successfully in the config server
       fail-fast: true
   # ==============================================================
   # = Proprietà Fonte Dati PostgreSQL
@@ -48,7 +50,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,refresh
         
 # ==============================================================
 # = Actuator Info

@@ -8,6 +8,16 @@ import org.springframework.stereotype.Component;
 public class AppConfig {
     private String listino;
 
+    public Double getSconto() {
+        return sconto;
+    }
+
+    public void setSconto(Double sconto) {
+        this.sconto = sconto;
+    }
+
+    private Double sconto = 0.00;
+
     public String getListino() {
         return listino;
     }

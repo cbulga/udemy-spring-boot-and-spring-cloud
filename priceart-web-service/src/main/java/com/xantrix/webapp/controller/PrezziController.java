@@ -7,6 +7,7 @@ import com.xantrix.webapp.entity.DettListini;
 import com.xantrix.webapp.service.PrezziService;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -62,6 +63,7 @@ public class PrezziController {
             {@ApiResponse(code = 200, message = "Il Prezzo è stato trovato!"),
             })
     @GetMapping(value = {"/{codart}/{idlist}", "/{codart}"})
+    @RefreshScope
     public double getPriceCodArt(@PathVariable("codart") String codArt, @PathVariable("idlist") Optional<String> optIdList) {
         double retVal = 0;
 
@@ -73,7 +75,10 @@ public class PrezziController {
 
         if (prezzo != null) {
             log.info("Prezzo Articolo: {}", prezzo.getPrezzo());
-            retVal = prezzo.getPrezzo();
+            double sconto = config.getSconto();
+            if (sconto > 0)
+                log.info("Attivato sconto {}%", sconto);
+            retVal = prezzo.getPrezzo() * (1 - (sconto / 100));
         } else
             log.warn("Prezzo Articolo Assente!!");
 
