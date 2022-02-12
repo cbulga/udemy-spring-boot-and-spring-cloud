@@ -7,6 +7,9 @@ server:
 spring:
   application:
     name: PriceArtWebService
+  # ==============================================================
+  # = Proprietà Config Server
+  # ==============================================================
   cloud:
     config:
       # indirizzo riferimento config server
@@ -20,6 +23,14 @@ spring:
       password: BimBumBam_2018
       # if fail-fast is true, the microservice will throw an exception during startup when it does not authenticate successfully in the config server
       fail-fast: true
+  # ==============================================================
+  # = Proprietà RabbitMQ
+  # ==============================================================
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: rabbitmq
+    password: rabbitmq
   # ==============================================================
   # = Proprietà Fonte Dati PostgreSQL
   # ==============================================================
@@ -50,7 +61,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,refresh
+        include: health,info,metrics,refresh,bus-refresh
         
 # ==============================================================
 # = Actuator Info
