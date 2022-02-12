@@ -12,7 +12,6 @@ spring:
     use-legacy-processing: false
   profiles:
     active: github
-
 # ==============================================================
 # = Actuator Parameters
 # ==============================================================
@@ -34,3 +33,8 @@ logging:
   level:
     org.springframework.cloud: DEBUG
     org.springframework.security: DEBUG
+
+jasypt:
+  encryptor:
+    # password passata come variabile da linea di comando al comando mvn di build per produrre un jar con già valorizzata questa property. Es.: mvn clean install -Denpwd=123_Stella.
+    password: ${enpwd}
