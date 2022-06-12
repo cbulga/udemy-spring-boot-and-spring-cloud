@@ -1,4 +1,4 @@
-package com.xantrix.webapp.UnitTest.ControllerTest;
+package com.xantrix.webapp.UnitTest.controller;
 
 import com.xantrix.webapp.Application;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +17,10 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@TestPropertySource(locations = "classpath:application-list100.properties")
+/**
+ * Integration test: config server needs to be started
+ */
+@TestPropertySource(properties = {"profilo=list100", "seq=1"})
 @ContextConfiguration(classes = Application.class)
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)

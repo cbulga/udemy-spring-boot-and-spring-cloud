@@ -12,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.NumberUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -78,7 +79,7 @@ public class PrezziController {
             double sconto = config.getSconto();
             if (sconto > 0)
                 log.info("Attivato sconto {}%", sconto);
-            retVal = prezzo.getPrezzo() * (1 - (sconto / 100));
+            retVal = Math.round(prezzo.getPrezzo() * (1 - (sconto / 100)) * 100) / 100.0;
         } else
             log.warn("Prezzo Articolo Assente!!");
 

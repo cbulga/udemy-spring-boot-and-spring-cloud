@@ -2,7 +2,8 @@
 # = PriceArt Web Service con Autenticazione JWT
 # ==============================================================
 server:
-  port: 5071
+  #port: 5071
+  port: 507${seq}
 
 spring:
   application:
@@ -15,7 +16,7 @@ spring:
       # indirizzo riferimento config server
       uri: http://localhost:8888
       # profilo attivo
-      profile: std
+      profile: ${profilo}
       # branch git da usare da cui caricare la configurazione del config server
       #label: list3
       # username and password to authenticate into the config server

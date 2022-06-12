@@ -1,4 +1,4 @@
-package com.xantrix.webapp.UnitTest.ControllerTest;
+package com.xantrix.webapp.UnitTest.controller;
 
 import com.xantrix.webapp.Application;
 import com.xantrix.webapp.repository.ListinoRepository;
@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -16,9 +17,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+/**
+ * Integration test: config server needs to be started
+ */
 @ContextConfiguration(classes = Application.class)
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestPropertySource(properties = {"profilo = list100", "seq = 1"})
 public class ListiniControllerTest {
 
     private MockMvc mockMvc;

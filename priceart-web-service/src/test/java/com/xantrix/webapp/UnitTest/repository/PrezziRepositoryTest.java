@@ -1,4 +1,4 @@
-package com.xantrix.webapp.UnitTest.RepositoryTest;
+package com.xantrix.webapp.UnitTest.repository;
 
 import com.xantrix.webapp.entity.DettListini;
 import com.xantrix.webapp.entity.Listini;
@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 
 import javax.transaction.Transactional;
 import java.util.HashSet;
@@ -21,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 //@TestPropertySource(locations="classpath:application-list1.properties")
 //@ContextConfiguration(classes = Application.class)
+@TestPropertySource(properties = {"profilo = std2", "seq = 1"})
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class PrezziRepositoryTest {
