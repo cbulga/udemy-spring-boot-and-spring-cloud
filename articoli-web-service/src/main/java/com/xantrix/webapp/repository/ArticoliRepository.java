@@ -2,6 +2,7 @@ package com.xantrix.webapp.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,6 +14,8 @@ public interface ArticoliRepository extends JpaRepository<Articoli, String> {
     Articoli findByCodArt(String codArt);
 
     List<Articoli> findByDescrizioneLike(String descrizione);
+
+    List<Articoli> findByDescrizioneLike(String descrizione, Pageable pageable);
 
     //JPQL
     @Query(value = "SELECT a FROM Articoli a JOIN a.barcode b WHERE b.barcode IN (:ean)")

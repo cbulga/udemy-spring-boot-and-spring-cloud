@@ -1,16 +1,14 @@
 package com.xantrix.webapp.entities;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import io.swagger.annotations.ApiModelProperty;
+import com.xantrix.webapp.validation.CodArt;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
@@ -21,6 +19,7 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor // Costruttore con tutti i parametri
+@Builder
 public class Articoli implements Serializable {
     private static final long serialVersionUID = 7361753083273455478L;
 
@@ -28,7 +27,7 @@ public class Articoli implements Serializable {
     @Column(name = "CODART")
 	@Size(min = 5, max = 20, message = "{Size.Articoli.codArt.Validation}")
 	@NotNull(message = "{NotNull.Articoli.codArt.Validation}")
-    @ApiModelProperty(notes = "Il Codice Interno Univoco dell'Articolo")
+    @CodArt
     private String codArt;
 
     @Column(name = "DESCRIZIONE")
@@ -39,6 +38,7 @@ public class Articoli implements Serializable {
     private String um;
 
     @Column(name = "CODSTAT")
+    @NotBlank(message = "{NotBlank.Articoli.codStat.Validation}")
     private String codStat;
 
     @Column(name = "PZCART")

@@ -1,16 +1,22 @@
 package com.xantrix.webapp.service;
 
+import com.xantrix.webapp.dtos.ArticoliDto;
 import com.xantrix.webapp.entities.Articoli;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface ArticoliService {
 
-    List<Articoli> selByDescrizione(String descrizione);
+    List<ArticoliDto> selByDescrizione(String descrizione);
 
-    Articoli selByCodArt(String codArt);
+    List<ArticoliDto> selByDescrizione(String descrizione, Pageable pageable);
 
-    Articoli selByBarCode(String barCode);
+    ArticoliDto selByCodArt(String codArt);
+
+    Articoli selByCodArt2(String codart);
+
+    ArticoliDto selByBarCode(String barCode);
 
     void delArticolo(Articoli articolo);
 

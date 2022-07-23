@@ -40,7 +40,7 @@ public class JwtTokenAuthorizationOncePerRequestFilter extends OncePerRequestFil
 
         final String requestTokenHeader = request.getHeader(this.tokenHeader);
 
-        log.warn("Addr: {}", request.getRequestURI());
+        log.warn("Address: {}, method: {}", request.getRequestURI(), request.getMethod());
         log.warn("Token: {}", requestTokenHeader);
 
         String username = null;

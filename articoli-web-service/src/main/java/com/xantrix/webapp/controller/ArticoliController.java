@@ -2,12 +2,20 @@ package com.xantrix.webapp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.xantrix.webapp.dtos.ArticoliDto;
 import com.xantrix.webapp.entities.Articoli;
 import com.xantrix.webapp.exception.BindingException;
 import com.xantrix.webapp.exception.DuplicateException;
+import com.xantrix.webapp.exception.ErrorResponse;
 import com.xantrix.webapp.exception.NotFoundException;
 import com.xantrix.webapp.service.ArticoliService;
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -25,7 +33,7 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/api/articoli")
 @Slf4j
-@Api(value = "Alphashop", tags = "Controller Operazioni di gestione dati articoli")
+@Tag(name = "ArticoliController", description = "Controller Operazioni di Gestione Dati Articoli")
 public class ArticoliController {
 
     public static final String BARCODE_NOT_FOUND = "Il barcode %s non è stato trovato!";
@@ -47,22 +55,20 @@ public class ArticoliController {
         this.errMessage = errMessage;
     }
 
-    @ApiOperation(
-		      value = "Ricerca l'articolo per BARCODE", 
-		      notes = "Restituisce i dati dell'articolo in formato JSON",
-		      response = Articoli.class, 
-		      produces = "application/json")
-	@ApiResponses(value =
-	{   @ApiResponse(code = 200, message = "L'articolo cercato è stato trovato!"),
-	    @ApiResponse(code = 404, message = "L'articolo cercato NON è stato trovato!"),
-	    @ApiResponse(code = 403, message = "Non sei AUTORIZZATO ad accedere alle informazioni"),
-	    @ApiResponse(code = 401, message = "Non sei AUTENTICATO")
-	})
+    @Operation(summary = "Ricerca l'articolo per BARCODE", description = "Restituisce i dati dell'articolo in formato JSON",
+            tags = {"Articoli"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "L'articolo cercato è stato trovato!",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Articoli.class))),
+            @ApiResponse(responseCode = "401", description = "Utente non AUTENTICATO", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Utente Non AUTORIZZATO ad accedere alle informazioni", content = @Content),
+            @ApiResponse(responseCode = "404", description = "L'articolo cercato NON è stato trovato!",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
     @GetMapping(value = "/cerca/ean/{barCode}", produces = "application/json")
     // ---------------------- Ricerca per barcode -----------------------------
-    public ResponseEntity<Articoli> listArtByEan(@ApiParam("Barcode univoco dell'articolo") @PathVariable("barCode") String barCode) throws NotFoundException {
+    public ResponseEntity<ArticoliDto> listArtByEan(@Parameter(description = "Barcode Articolo", required = true) @PathVariable("barCode") String barCode) throws NotFoundException {
         log.info("****** Otteniamo l'articolo con barcode {} ******", barCode);
-        Articoli articolo = articoliService.selByBarCode(barCode);
+        ArticoliDto articolo = articoliService.selByBarCode(barCode);
 
         if (articolo == null) {
             String errorMessage = String.format(BARCODE_NOT_FOUND, barCode);
@@ -73,22 +79,17 @@ public class ArticoliController {
         return new ResponseEntity<>(articolo, HttpStatus.OK);
     }
 
-	// ------------------- Ricerca Per Codice ------------------------------------
-	@ApiOperation(
-		      value = "Ricerca l'articolo per CODICE", 
-		      notes = "Restituisce i dati dell'articolo in formato JSON",
-		      response = Articoli.class, 
-		      produces = "application/json")
-	@ApiResponses(value =
-	{ 	@ApiResponse(code = 200, message = "L'articolo cercato è stato trovato!"),
-		@ApiResponse(code = 404, message = "L'articolo cercato NON è stato trovato!"),
-		@ApiResponse(code = 403, message = "Non sei AUTORIZZATO ad accedere alle informazioni"),
-		@ApiResponse(code = 401, message = "Non sei AUTENTICATO")
-	})
+    // ------------------- Ricerca Per Codice ------------------------------------
+    @Operation(summary = "Ricerca l'articolo per CODICE", description = "Restituisce i dati dell'articolo in formato JSON", tags = {"Articoli"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "L'articolo cercato è stato trovato!", content = @Content(schema = @Schema(implementation = Articoli.class))),
+            @ApiResponse(responseCode = "401", description = "Utente non AUTENTICATO", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Utente Non AUTORIZZATO ad accedere alle informazioni", content = @Content),
+            @ApiResponse(responseCode = "404", description = "L'articolo cercato NON è stato trovato!", content = @Content)})
     @GetMapping(value = "/cerca/codice/{codArt}", produces = "application/json")
-    public ResponseEntity<Articoli> listArtByCodArt(@ApiParam("Codice univoco dell'articolo") @PathVariable("codArt") String codArt) throws NotFoundException {
+    public ResponseEntity<ArticoliDto> listArtByCodArt(@Parameter(description = "Codice univoco dell'articolo", required = true) @PathVariable("codArt") String codArt) throws NotFoundException {
         log.info("****** Otteniamo l'articolo con codice {} ******", codArt);
-        Articoli articolo = articoliService.selByCodArt(codArt);
+        ArticoliDto articolo = articoliService.selByCodArt(codArt);
 
         if (articolo == null) {
             String errorMessage = String.format(ARTICOLO_NON_TROVATO, codArt);
@@ -99,22 +100,17 @@ public class ArticoliController {
         return new ResponseEntity<>(articolo, HttpStatus.OK);
     }
 
-	// ------------------- Ricerca Per Descrizione ------------------------------------
-	@ApiOperation(
-		      value = "Ricerca l'articolo per DESCRIZIONE o parte di essa", 
-		      notes = "Restituisce un collezione di articoli in formato JSON",
-		      response = Articoli.class, 
-		      produces = "application/json")
-	@ApiResponses(value =
-	{   @ApiResponse(code = 200, message = "L'articolo/i sono stati trovati"),
-		@ApiResponse(code = 404, message = "Non è stato trovato alcun articolo"),
-		@ApiResponse(code = 403, message = "Non sei AUTORIZZATO ad accedere alle informazioni"),
-		@ApiResponse(code = 401, message = "Non sei AUTENTICATO")
-	})
+    // ------------------- Ricerca Per Descrizione ------------------------------------
+    @Operation(summary = "Ricerca uno o più articoli per descrizione o parte", description = "Restituisce i dati dell'articolo in formato JSON", tags = {"Articoli"})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "L'articolo/i cercato/i sono stati trovati!", content = @Content(schema = @Schema(implementation = Articoli.class))),
+            @ApiResponse(responseCode = "401", description = "Utente non AUTENTICATO", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Utente Non AUTORIZZATO ad accedere alle informazioni", content = @Content),
+            @ApiResponse(responseCode = "404", description = "L'articolo/i cercato/i NON sono stati trovati!", content = @Content)})
     @GetMapping(value = "/cerca/descrizione/{descrizione}", produces = "application/json")
-    public ResponseEntity<List<Articoli>> listArtByDescrizione(@ApiParam("Descrizione dell'articolo") @PathVariable("descrizione") String descrizione) throws NotFoundException {
+    public ResponseEntity<List<ArticoliDto>> listArtByDescrizione(@Parameter(description = "Descrizione dell'articolo", required = true) @PathVariable("descrizione") String descrizione) throws NotFoundException {
         log.info("****** Otteniamo gli articoli con descrizione {} ******", descrizione);
-        List<Articoli> articoli = articoliService.selByDescrizione(descrizione + "%");
+        List<ArticoliDto> articoli = articoliService.selByDescrizione(descrizione + "%");
         if (articoli.isEmpty()) {
             String errorMessage = String.format(ARTICOLO_PER_DESCRIZIONE_NON_TROVATO, descrizione);
             log.warn(errorMessage);
@@ -124,20 +120,20 @@ public class ArticoliController {
         return new ResponseEntity<>(articoli, HttpStatus.OK);
     }
 
-	// ------------------- INSERIMENTO ARTICOLO ------------------------------------
-	@ApiOperation(
-		      value = "Inserimento dati NUOVO articolo", 
-		      notes = "Può essere usato solo per l'inserimento dati di un nuovo articolo",
-		      produces = "application/json")
-	@ApiResponses(value =
-	{   @ApiResponse(code = 200, message = "Dati articolo salvati con successo"),
-		@ApiResponse(code = 400, message = "Uno o più dati articolo non validi"),
-		@ApiResponse(code = 406, message = "Inserimento dati articolo esistente in anagrafica"),
-		@ApiResponse(code = 403, message = "Non sei AUTORIZZATO ad inserire dati"),
-		@ApiResponse(code = 401, message = "Non sei AUTENTICATO")
-	})
+    // ------------------- INSERIMENTO ARTICOLO ------------------------------------
+    @Operation(
+            summary = "Inserimento dati NUOVO articolo",
+            description = "Può essere usato solo per l'inserimento dati di un nuovo articolo",
+            tags = {"Articoli"})
+    @ApiResponses(value =
+            {@ApiResponse(responseCode = "200", description = "Dati articolo salvati con successo"),
+                    @ApiResponse(responseCode = "400", description = "Uno o più dati articolo non validi"),
+                    @ApiResponse(responseCode = "406", description = "Inserimento dati articolo esistente in anagrafica"),
+                    @ApiResponse(responseCode = "403", description = "Non sei AUTORIZZATO ad inserire dati"),
+                    @ApiResponse(responseCode = "401", description = "Non sei AUTENTICATO")
+            })
     @PostMapping(value = "/inserisci", produces = "application/json")
-    public ResponseEntity<?> createArt(@ApiParam("JSON che rappresenta l'articolo") @Valid @RequestBody Articoli articoli, BindingResult bindingResult) throws DuplicateException, BindingException {
+    public ResponseEntity<?> createArt(@Parameter(description = "JSON che rappresenta l'articolo", required = true) @Valid @RequestBody Articoli articoli, BindingResult bindingResult) throws DuplicateException, BindingException {
         log.info("****** Salviamo l'articolo con codice {} ******", articoli.getCodArt());
 
         if (bindingResult.hasErrors()) {
@@ -146,7 +142,7 @@ public class ArticoliController {
             throw new BindingException(msgErr);
         }
         log.debug("Verifichiamo la presenza dell'articolo passato");
-        Articoli duplicatedArticoli = articoliService.selByCodArt(articoli.getCodArt());
+        ArticoliDto duplicatedArticoli = articoliService.selByCodArt(articoli.getCodArt());
         if (duplicatedArticoli != null) {
             String errorMessage = String.format(ARTICOLO_DUPLICATO_IMPOSSIBILE_UTILIZZARE_IL_METODO_POST, articoli.getCodArt());
             log.warn(errorMessage);
@@ -166,20 +162,20 @@ public class ArticoliController {
         return new ResponseEntity<>(responseNode, headers, HttpStatus.CREATED);
     }
 
-	// ------------------- MODIFICA ARTICOLO ------------------------------------
-	@ApiOperation(
-		      value = "MODIFICA dati articolo in anagrfica", 
-		      notes = "Può essere usato solo per la modifica dati di un articolo presente in anagrafica",
-		      produces = "application/json")
-	@ApiResponses(value =
-	{   @ApiResponse(code = 200, message = "Dati articolo salvati con successo"),
-		@ApiResponse(code = 400, message = "Uno o più dati articolo non validi"),
-		@ApiResponse(code = 404, message = "Articolo non presente in anagrafica"),
-		@ApiResponse(code = 403, message = "Non sei AUTORIZZATO ad inserire dati"),
-		@ApiResponse(code = 401, message = "Non sei AUTENTICATO")
-	})
+    // ------------------- MODIFICA ARTICOLO ------------------------------------
+    @Operation(
+            summary = "MODIFICA dati articolo in anagrfica",
+            description = "Può essere usato solo per la modifica dati di un articolo presente in anagrafica",
+            tags = {"Articoli"})
+    @ApiResponses(value =
+            {@ApiResponse(responseCode = "200", description = "Dati articolo salvati con successo"),
+                    @ApiResponse(responseCode = "400", description = "Uno o più dati articolo non validi"),
+                    @ApiResponse(responseCode = "404", description = "Articolo non presente in anagrafica"),
+                    @ApiResponse(responseCode = "403", description = "Non sei AUTORIZZATO ad inserire dati"),
+                    @ApiResponse(responseCode = "401", description = "Non sei AUTENTICATO")
+            })
     @PutMapping(value = "/modifica", produces = "application/json")
-    public ResponseEntity<?> updateArt(@ApiParam("JSON che rappresenta l'articolo") @Valid @RequestBody Articoli articoli, BindingResult bindingResult) throws NotFoundException, BindingException {
+    public ResponseEntity<?> updateArt(@Parameter(description = "JSON che rappresenta l'articolo", required = true) @Valid @RequestBody Articoli articoli, BindingResult bindingResult) throws NotFoundException, BindingException {
         log.info("****** Modifichiamo l'articolo con codice {} ******", articoli.getCodArt());
 
         if (bindingResult.hasErrors()) {
@@ -188,7 +184,7 @@ public class ArticoliController {
             throw new BindingException(msgErr);
         }
 
-        Articoli articoliToUpdate = articoliService.selByCodArt(articoli.getCodArt());
+        ArticoliDto articoliToUpdate = articoliService.selByCodArt(articoli.getCodArt());
         if (articoliToUpdate == null) {
             String errorMessage = String.format(ARTICOLO_NON_PRESENTE_IN_ANAGRAFICA_IMPOSSIBILE_UTILIZZARE_IL_METODO_PUT, articoli.getCodArt());
             log.warn(errorMessage);
@@ -208,21 +204,21 @@ public class ArticoliController {
         return new ResponseEntity<>(result, headers, HttpStatus.CREATED);
     }
 
-	@ApiOperation(
-		      value = "ELIMINAZIONE dati articolo in anagrfica", 
-		      notes = "Si esegue una eliminazione a cascata dei barcode e degli ingredienti",
-		      produces = "application/json")
-	@ApiResponses(value =
-	{   @ApiResponse(code = 200, message = "Dati articolo eliminati con successo"),
-		@ApiResponse(code = 404, message = "Articolo non presente in anagrafica"),
-		@ApiResponse(code = 403, message = "Non sei AUTORIZZATO ad inserire dati"),
-		@ApiResponse(code = 401, message = "Non sei AUTENTICATO")
-	})
+    @Operation(
+            summary = "ELIMINAZIONE dati articolo in anagrfica",
+            description = "Si esegue una eliminazione a cascata dei barcode e degli ingredienti",
+            tags = {"Articoli"})
+    @ApiResponses(value =
+            {@ApiResponse(responseCode = "200", description = "Dati articolo eliminati con successo"),
+                    @ApiResponse(responseCode = "404", description = "Articolo non presente in anagrafica"),
+                    @ApiResponse(responseCode = "403", description = "Non sei AUTORIZZATO ad inserire dati"),
+                    @ApiResponse(responseCode = "401", description = "Non sei AUTENTICATO")
+            })
     @DeleteMapping(value = "/elimina/{codArt}", produces = "application/json")
-    public ResponseEntity<?> deleteArt(@ApiParam("Codice univoco dell'articolo") @PathVariable("codArt") String codArt) throws NotFoundException {
+    public ResponseEntity<?> deleteArt(@Parameter(description = "Codice univoco dell'articolo", required = true) @PathVariable("codArt") String codArt) throws NotFoundException {
         log.info("****** Eliminiamo l'articolo con codice {} ******", codArt);
 
-        Articoli articoliToDelete = articoliService.selByCodArt(codArt);
+        Articoli articoliToDelete = articoliService.selByCodArt2(codArt);
         if (articoliToDelete == null) {
             String errorMessage = String.format(ARTICOLO_NON_PRESENTE_IN_ANAGRAFICA, codArt);
             log.warn(errorMessage);

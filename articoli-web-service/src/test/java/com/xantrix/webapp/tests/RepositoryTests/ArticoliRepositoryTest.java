@@ -25,13 +25,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestMethodOrder(OrderAnnotation.class)
 public class ArticoliRepositoryTest {
 
+    public static final String COD_ART_TEST = "500123456789";
     @Autowired
     private ArticoliRepository articoliRepository;
 
     @Test
     @Order(1)
     public void testInsArticolo() {
-        Articoli articolo = new Articoli("123Test", "Articolo di Test", 6, 1.75, "1");
+        Articoli articolo = Articoli.builder()
+                .codArt(COD_ART_TEST)
+                .descrizione("Articolo di Test")
+                .pzCart(6)
+                .pesoNetto(1.75)
+                .idStatoArt("1")
+                .codStat("TESTTEST")
+                .build();
 
         FamAssort famAssort = new FamAssort();
         famAssort.setId(1);
@@ -44,7 +52,7 @@ public class ArticoliRepositoryTest {
 
         articoliRepository.save(articolo);
 
-        assertThat(articoliRepository.findByCodArt("123Test"))
+        assertThat(articoliRepository.findByCodArt(COD_ART_TEST))
                 .extracting(Articoli::getDescrizione)
                 .isEqualTo("Articolo di Test");
     }
@@ -67,7 +75,7 @@ public class ArticoliRepositoryTest {
     @Test
     @Order(4)
     public void testDelArticolo() {
-        Articoli articolo = articoliRepository.findByCodArt("123Test");
+        Articoli articolo = articoliRepository.findByCodArt(COD_ART_TEST);
         articoliRepository.delete(articolo);
     }
 }

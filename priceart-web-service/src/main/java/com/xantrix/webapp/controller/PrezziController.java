@@ -5,14 +5,17 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.xantrix.webapp.appconf.AppConfig;
 import com.xantrix.webapp.entity.DettListini;
 import com.xantrix.webapp.service.PrezziService;
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.NumberUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -20,8 +23,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/prezzi")
 @Slf4j
-@Api(value = "alphashop", tags = "Controller Operazioni di ottenimento e eliminazione prezzo articolo")
-@ApiOperation(value = "", authorizations = {@Authorization(value = "jwtToken")})
+@Tag(name = "PrezziController", description = "Controller Operazioni di ottenimento e eliminazione prezzo articolo")
 public class PrezziController {
 
     private final PrezziService prezziService;
@@ -55,17 +57,17 @@ public class PrezziController {
     }
 
     // ------------------- SELECT PREZZO CODART ------------------------------------
-    @ApiOperation(
-            value = "Ricerca il PREZZO dell'articolo selezionato",
-            notes = "pprevede il parametro opzionale idlist",
-            response = Double.class,
-            produces = "application/json")
+    @Operation(
+            summary = "Ricerca il PREZZO dell'articolo selezionato",
+            description = "pprevede il parametro opzionale idlist",
+            tags = {"Prezzi"})
     @ApiResponses(value =
-            {@ApiResponse(code = 200, message = "Il Prezzo è stato trovato!"),
+            {@ApiResponse(responseCode = "200", description = "Il Prezzo è stato trovato!"),
             })
     @GetMapping(value = {"/{codart}/{idlist}", "/{codart}"})
     @RefreshScope
-    public double getPriceCodArt(@PathVariable("codart") String codArt, @PathVariable("idlist") Optional<String> optIdList) {
+    public double getPriceCodArt(@Parameter(description = "Codice Articolo", required = true) @PathVariable("codart") String codArt,
+                                 @Parameter(description = "ID Listino") @PathVariable("idlist") Optional<String> optIdList) {
         double retVal = 0;
 
         String idList = optIdList.orElseGet(config::getListino);

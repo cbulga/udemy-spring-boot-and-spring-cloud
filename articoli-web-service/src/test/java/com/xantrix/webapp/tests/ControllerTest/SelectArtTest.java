@@ -50,7 +50,7 @@ public class SelectArtTest {
                     "    \"pzCart\": 6,\n" +
                     "    \"pesoNetto\": 1.5,\n" +
                     "    \"idStatoArt\": \"1\",\n" +
-                    "    \"dataCreaz\": \"2010-06-14\",\n" +
+                    "    \"dataCreazione\": \"2010-06-14\",\n" +
                     "    \"barcode\": [\n" +
                     "        {\n" +
                     "            \"barcode\": \"8008490000021\",\n" +
@@ -92,8 +92,8 @@ public class SelectArtTest {
                 .andExpect(jsonPath("$.pesoNetto").value("1.5"))
                 .andExpect(jsonPath("$.idStatoArt").exists())
                 .andExpect(jsonPath("$.idStatoArt").value("1"))
-                .andExpect(jsonPath("$.dataCreaz").exists())
-                .andExpect(jsonPath("$.dataCreaz").value("2010-06-14"))
+                .andExpect(jsonPath("$.dataCreazione").exists())
+                .andExpect(jsonPath("$.dataCreazione").value("2010-06-14"))
                 //barcode
                 .andExpect(jsonPath("$.barcode[0].barcode").exists())
                 .andExpect(jsonPath("$.barcode[0].barcode").value("8008490000021"))
@@ -175,10 +175,11 @@ public class SelectArtTest {
     @Test
     @Order(6)
     public void testErrlistArtByDesc() throws Exception {
-        String Filter = "123ABC";
+        String Filter = "5001234848";
 
         mockMvc.perform(MockMvcRequestBuilders.get(apiBaseUrl + "/cerca/descrizione/" + Filter)
                 .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.codice").value(404))
                 .andExpect(jsonPath("$.messaggio").value("Non è stato trovato alcun articolo avente descrizione " + Filter))

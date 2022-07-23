@@ -59,7 +59,7 @@ public class TestSecurityRoleAdmin {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.code").value("200 OK"))
-                .andExpect(jsonPath("$.message").value("Inserimento Articolo 123Test Eseguito Con Successo"))
+                .andExpect(jsonPath("$.message").value("Inserimento Articolo 5001234949 Eseguito Con Successo"))
 
                 .andDo(print());
     }
@@ -67,11 +67,11 @@ public class TestSecurityRoleAdmin {
     @Test
     @Order(3)
     public void testDelArticolo() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete(apiBaseUrl + "/elimina/123Test")
+        mockMvc.perform(MockMvcRequestBuilders.delete(apiBaseUrl + "/elimina/5001234949")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("200 OK"))
-                .andExpect(jsonPath("$.message").value("Eliminazione Articolo 123Test Eseguita Con Successo"))
+                .andExpect(jsonPath("$.message").value("Eliminazione Articolo 5001234949 Eseguita Con Successo"))
                 .andDo(print());
     }
 }

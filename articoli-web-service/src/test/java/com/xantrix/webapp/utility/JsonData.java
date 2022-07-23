@@ -12,7 +12,7 @@ public class JsonData {
                         "    \"pzCart\": 6,\n" +
                         "    \"pesoNetto\": 1.5,\n" +
                         "    \"idStatoArt\": \"1\",\n" +
-                        "    \"dataCreaz\": \"2010-06-14\",\n" +
+                        "    \"dataCreazione\": \"2010-06-14\",\n" +
                         "    \"barcode\": [\n" +
                         "        {\n" +
                         "            \"barcode\": \"8008490000021\",\n" +
@@ -37,14 +37,14 @@ public class JsonData {
     public static String getTestArtData() {
         String jsonData =
                 "{\r\n" +
-                        "    \"codArt\": \"123Test\",\r\n" +
+                        "    \"codArt\": \"5001234949\",\r\n" +
                         "    \"descrizione\": \"Articoli Unit Test Inserimento\",\r\n" +
                         "    \"um\": \"PZ\",\r\n" +
                         "    \"codStat\": \"TESTART\",\r\n" +
                         "    \"pzCart\": 6,\r\n" +
                         "    \"pesoNetto\": 1.75,\r\n" +
                         "    \"idStatoArt\": \"1\",\r\n" +
-                        "    \"dataCreaz\": \"2019-05-14\",\r\n" +
+                        "    \"dataCreazione\": \"2019-05-14\",\r\n" +
                         "    \"barcode\": [\r\n" +
                         "        {\r\n" +
                         "            \"barcode\": \"12345678\",\r\n" +

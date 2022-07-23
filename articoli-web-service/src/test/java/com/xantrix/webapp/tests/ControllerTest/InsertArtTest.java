@@ -50,7 +50,7 @@ public class InsertArtTest {
 
     String JsonData =
             "{\r\n" +
-                    "    \"codArt\": \"123Test\",\r\n" +
+                    "    \"codArt\": \"500123456789\",\r\n" +
                     "    \"descrizione\": \"Articoli Unit Test Inserimento\",\r\n" +
                     "    \"um\": \"PZ\",\r\n" +
                     "    \"codStat\": \"TESTART\",\r\n" +
@@ -86,13 +86,13 @@ public class InsertArtTest {
                 .andExpect(status().isCreated())
                 .andDo(print())
                 .andExpect(jsonPath("$.code").value("200 OK"))
-                .andExpect(jsonPath("$.message").value(String.format(INSERIMENTO_ARTICOLO_ESEGUITO_CON_SUCCESSO, "123Test")))
+                .andExpect(jsonPath("$.message").value(String.format(INSERIMENTO_ARTICOLO_ESEGUITO_CON_SUCCESSO, "500123456789")))
 
                 .andDo(print());
 
-        assertThat(articoliRepository.findByCodArt("123Test"))
+        assertThat(articoliRepository.findByCodArt("500123456789"))
                 .extracting(Articoli::getCodArt)
-                .isEqualTo("123Test");
+                .isEqualTo("500123456789");
     }
 
     @Test
@@ -104,13 +104,13 @@ public class InsertArtTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotAcceptable())
                 .andExpect(jsonPath("$.codice").value(406))
-                .andExpect(jsonPath("$.messaggio").value(String.format(ARTICOLO_DUPLICATO_IMPOSSIBILE_UTILIZZARE_IL_METODO_POST, "123Test")))
+                .andExpect(jsonPath("$.messaggio").value(String.format(ARTICOLO_DUPLICATO_IMPOSSIBILE_UTILIZZARE_IL_METODO_POST, "500123456789")))
                 .andDo(print());
     }
 
     String ErrJsonData =
             "{\r\n" +
-                    "    \"codArt\": \"123Test\",\r\n" +
+                    "    \"codArt\": \"500123456789\",\r\n" +
                     "    \"descrizione\": \"\",\r\n" +  //<<< Articolo privo di descrizione
                     "    \"um\": \"PZ\",\r\n" +
                     "    \"codStat\": \"TESTART\",\r\n" +
@@ -151,7 +151,7 @@ public class InsertArtTest {
 
     String JsonDataMod =
             "{\r\n" +
-                    "    \"codArt\": \"123Test\",\r\n" +
+                    "    \"codArt\": \"500123456789\",\r\n" +
                     "    \"descrizione\": \"Articoli Unit Test Inserimento\",\r\n" +
                     "    \"um\": \"PZ\",\r\n" +
                     "    \"codStat\": \"TESTART\",\r\n" +
@@ -186,17 +186,17 @@ public class InsertArtTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.code").value("200 OK"))
-                .andExpect(jsonPath("$.message").value("Modifica Articolo 123Test Eseguita Con Successo"))
+                .andExpect(jsonPath("$.message").value("Modifica Articolo 500123456789 Eseguita Con Successo"))
                 .andDo(print());
 
-        assertThat(articoliRepository.findByCodArt("123Test"))
+        assertThat(articoliRepository.findByCodArt("500123456789"))
                 .extracting(Articoli::getIdStatoArt)
                 .isEqualTo("2");
     }
 
     String ErrJsonDataMod =
             "{\r\n" +
-                    "    \"codArt\": \"pippo123\",\r\n" +
+                    "    \"codArt\": \"500999888777\",\r\n" +
                     "    \"descrizione\": \"Articoli Unit Test Inserimento\",\r\n" +
                     "    \"um\": \"PZ\",\r\n" +
                     "    \"codStat\": \"TESTART\",\r\n" +
@@ -231,31 +231,31 @@ public class InsertArtTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.codice").value(404))
-                .andExpect(jsonPath("$.messaggio").value("Articolo pippo123 non presente in anagrafica! Impossibile utilizzare il metodo PUT"))
+                .andExpect(jsonPath("$.messaggio").value("Articolo 500999888777 non presente in anagrafica! Impossibile utilizzare il metodo PUT"))
                 .andDo(print());
     }
 
     @Test
     @Order(6)
     public void testDelArticolo() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete(ApiBaseUrl + "/elimina/123Test")
+        mockMvc.perform(MockMvcRequestBuilders.delete(ApiBaseUrl + "/elimina/500123456789")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("200 OK"))
-                .andExpect(jsonPath("$.message").value(String.format(ELIMINAZIONE_ARTICOLO_ESEGUITA_CON_SUCCESSO, "123Test")))
+                .andExpect(jsonPath("$.message").value(String.format(ELIMINAZIONE_ARTICOLO_ESEGUITA_CON_SUCCESSO, "500123456789")))
                 .andDo(print());
     }
 
     @Test
     @Order(7)
     public void testErrDelArticolo() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete(ApiBaseUrl + "/elimina/123Test")
+        mockMvc.perform(MockMvcRequestBuilders.delete(ApiBaseUrl + "/elimina/500123456789")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(ErrJsonDataMod)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.codice").value(404))
-                .andExpect(jsonPath("$.messaggio").value(String.format(ARTICOLO_NON_PRESENTE_IN_ANAGRAFICA, "123Test")))
+                .andExpect(jsonPath("$.messaggio").value(String.format(ARTICOLO_NON_PRESENTE_IN_ANAGRAFICA, "500123456789")))
                 .andDo(print());
     }
 }

@@ -79,6 +79,7 @@ public class JWTWebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/webjars/**",            // swagger-ui webjars
                         "/swagger-resources/**",  // swagger-ui resources
                         "/configuration/**",      // swagger configuration
+                        "/swagger-ui/index.html",
                         "/swagger-ui.html",
                         "/favicon.ico",
                         "/**/*.html",
@@ -98,6 +99,6 @@ public class JWTWebSecurityConfig extends WebSecurityConfigurerAdapter {
         webSecurity.ignoring().antMatchers(HttpMethod.POST, authenticationPath)
                 .antMatchers(HttpMethod.OPTIONS, "/**")
                 .and()
-                .ignoring().antMatchers(HttpMethod.GET, "/");
+                .ignoring().antMatchers("/v3/api-docs/**", "/bus/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/swagger-resources/", "/webjars/");
     }
 }

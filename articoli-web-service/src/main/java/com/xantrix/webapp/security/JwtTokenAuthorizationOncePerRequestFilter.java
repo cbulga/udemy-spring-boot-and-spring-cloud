@@ -38,6 +38,8 @@ public class JwtTokenAuthorizationOncePerRequestFilter extends OncePerRequestFil
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.debug("Richiesta di autenticazione da '{}'", request.getRequestURL());
         final String requestTokenHeader = request.getHeader(this.tokenHeader);
+
+        log.warn("Address: {}, method: {}", request.getRequestURI(), request.getMethod());
         log.warn("Token: {}", requestTokenHeader);
 
         String username = null;
