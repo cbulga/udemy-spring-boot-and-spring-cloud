@@ -86,7 +86,8 @@ logging:
 #      xantrix:
 #        DEBUG
     org.springframework.security: DEBUG
-    org.hibernate: INFO
+    org.hibernate.sql: DEBUG
+    org.hibernate.type: TRACE
     org.springframework.web: INFO
     com.xantrix.webapp: DEBUG
 

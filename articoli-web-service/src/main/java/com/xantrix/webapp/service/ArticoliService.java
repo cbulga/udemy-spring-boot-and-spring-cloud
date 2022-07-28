@@ -16,9 +16,11 @@ public interface ArticoliService {
 
     Articoli selByCodArt2(String codart);
 
-    ArticoliDto selByBarCode(String barCode);
+    ArticoliDto selByBarCode(String barcode);
 
     void delArticolo(Articoli articolo);
 
     void insArticolo(Articoli articolo);
+
+    void cleanCaches();
 }

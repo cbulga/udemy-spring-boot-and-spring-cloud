@@ -1,5 +1,6 @@
 package com.xantrix.webapp.controller;
 
+import com.xantrix.webapp.service.ArticoliService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
@@ -12,14 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class CachingController {
 
     @Autowired
-    CacheManager cacheManager;
+    ArticoliService articoliService;
 
     @GetMapping("clearAllCaches")
     public void clearAllCaches() {
         log.info("Clearing all caches");
-        cacheManager.getCacheNames().forEach(cache -> {
-            log.debug("Clearing cache {}", cache);
-            cacheManager.getCache(cache).clear();
-        });
+        articoliService.cleanCaches();
     }
 }
