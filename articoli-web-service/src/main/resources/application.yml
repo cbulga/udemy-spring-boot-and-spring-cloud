@@ -74,7 +74,8 @@ logging:
     name: "/home/cristian/tmp/Udemy/spring-cloud-course/logs/ArtSrv.log"
   pattern:
     file: "%d{ dd-MM-yyyy } [%thread] %-5level %logger{36} - %msg%n"
-    console: "%d{dd-MM-yyyy HH:mm:ss} - %msg%n"
+#    console: "%d{dd-MM-yyyy HH:mm:ss} - %msg%n"
+    console: "%d{dd.MM.yyyy HH:mm:ss.SSS} %-5p - [%C]:%m%n"
 
   logback:
     rollingpolicy:
@@ -86,10 +87,11 @@ logging:
 #      xantrix:
 #        DEBUG
     org.springframework.security: DEBUG
-    org.hibernate.sql: DEBUG
-    org.hibernate.type: TRACE
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
     org.springframework.web: INFO
     com.xantrix.webapp: DEBUG
+    com.hazelcast: INFO
 
 # Opzioni accesso servizio gestUser
 gestuser:
