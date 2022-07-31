@@ -24,7 +24,8 @@ public class Utenti {
     @Size(min = 8, max = 80, message = "{Size.Utenti.password.Validation}")
     private String password;
 
-    private String attivo;
+    private String attivo = "Si";
 
+    @NotNull(message = "{NotNull.Utenti.ruoli.Validation}")
     private List<String> ruoli;
 }

@@ -19,6 +19,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,6 +30,7 @@ public class UtentiController {
 
     public static final String UTENTE_NON_TROVATO = "L'utente %s non è stato trovato!";
     public static final String INSERIMENTO_UTENTE_ESEGUITO_CON_SUCCESSO = "Inserimento Utente %s Eseguito Con Successo";
+    public static final String MODIFICA_UTENTE_ESEGUITO_CON_SUCCESSO = "Modifica Utente %s Eseguito Con Successo";
     public static final String UTENTE_NON_PRESENTE_IN_ANAGRAFICA = "Utente %s non presente in anagrafica!";
     @Autowired
     UtentiService utentiService;
@@ -63,9 +65,16 @@ public class UtentiController {
 
     // ------------------- INSERIMENTO/MODIFICA UTENTE ------------------------------------
     @PostMapping(value = "/inserisci")
-    public ResponseEntity<?> addNewUser(@Valid @RequestBody Utenti utente,
+    public ResponseEntity<InfoMsg> addNewUser(@Valid @RequestBody Utenti utente,
                                         BindingResult bindingResult) throws BindingException {
-        log.info("Inserimento Nuovo Utente");
+        Utenti checkUtente = utentiService.selUser(utente.getUserId());
+
+        if (checkUtente != null) {
+            log.info("Modifica Utente");
+            utente.setId(checkUtente.getId());
+        } else {
+            log.info("Inserimento Nuovo Utente");
+        }
 
         if (bindingResult.hasErrors()) {
             String msgErr = errMessage.getMessage(Objects.requireNonNull(bindingResult.getFieldError()), LocaleContextHolder.getLocale());
@@ -77,17 +86,9 @@ public class UtentiController {
         utente.setPassword(encodedPassword);
         utentiService.save(utente);
 
-        HttpHeaders headers = new HttpHeaders();
-        ObjectMapper mapper = new ObjectMapper();
-
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        ObjectNode responseNode = mapper.createObjectNode();
-
-        responseNode.put("code", HttpStatus.OK.toString());
-        responseNode.put("message", String.format(INSERIMENTO_UTENTE_ESEGUITO_CON_SUCCESSO, utente.getUserId()));
-
-        return new ResponseEntity<>(responseNode, headers, HttpStatus.CREATED);
+        return new ResponseEntity<>(new InfoMsg(LocalDate.now(), HttpStatus.OK.toString(),
+                String.format(checkUtente != null ? MODIFICA_UTENTE_ESEGUITO_CON_SUCCESSO : INSERIMENTO_UTENTE_ESEGUITO_CON_SUCCESSO,
+                        utente.getUserId())), HttpStatus.CREATED);
     }
 
     // ------------------- ELIMINAZIONE UTENTE ------------------------------------

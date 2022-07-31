@@ -5,11 +5,11 @@ import com.xantrix.webapp.model.Utenti;
 import java.util.List;
 
 public interface UtentiService {
-    public List<Utenti> selTutti();
+    List<Utenti> selTutti();
 
-    public Utenti selUser(String UserId);
+    Utenti selUser(String userId);
 
-    public void save(Utenti utente);
+    void save(Utenti utente);
 
-    public void delete(Utenti utente);
+    void delete(Utenti utente);
 }
