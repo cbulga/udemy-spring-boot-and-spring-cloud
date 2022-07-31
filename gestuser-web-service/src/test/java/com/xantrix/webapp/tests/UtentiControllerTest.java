@@ -5,6 +5,7 @@ import com.xantrix.webapp.repository.UtentiRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
@@ -14,7 +15,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 
+import static com.xantrix.webapp.controller.UtentiController.INSERIMENTO_UTENTE_ESEGUITO_CON_SUCCESSO;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -54,12 +57,21 @@ public class UtentiControllerTest {
     @Test
     @Order(1)
     void testInsUtente1() throws Exception {
+        //Eliminiamo tutti gli utenti
+        utentiRepository.deleteAll();
+
         mockMvc.perform(MockMvcRequestBuilders.post("/api/utenti/inserisci")
                         .characterEncoding(StandardCharsets.UTF_8.toString())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonData)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data").exists())
+                .andExpect(jsonPath("$.data").value(LocalDate.now().toString()))
+                .andExpect(jsonPath("$.code").exists())
+                .andExpect(jsonPath("$.code").value(HttpStatus.OK.toString()))
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.message").value(String.format(INSERIMENTO_UTENTE_ESEGUITO_CON_SUCCESSO, "Cristian")))
                 .andDo(print());
     }
 
