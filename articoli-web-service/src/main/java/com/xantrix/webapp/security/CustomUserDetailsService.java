@@ -32,7 +32,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-        if (userId == null || userId.length() < 2) {
+        if (userId == null || userId.length() < 5) {
             log.warn(NOME_UTENTE_ASSENTE_O_NON_VALIDO);
             throw new UsernameNotFoundException(NOME_UTENTE_ASSENTE_O_NON_VALIDO);
         }
