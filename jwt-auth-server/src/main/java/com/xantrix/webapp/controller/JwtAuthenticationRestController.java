@@ -1,6 +1,7 @@
 package com.xantrix.webapp.controller;
 
 import com.xantrix.webapp.security.JwtTokenUtil;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -54,7 +55,7 @@ public class JwtAuthenticationRestController {
         return ResponseEntity.ok(new JwtTokenResponse(token));
     }
 
-    @RequestMapping(value = "${sicurezza.uri}", method = RequestMethod.GET)
+    @RequestMapping(value = "${sicurezza.refresh}", method = RequestMethod.GET)
     public ResponseEntity<?> refreshAndGetAuthenticationToken(HttpServletRequest request) throws Exception {
         String authToken = request.getHeader(tokenHeader);
 
@@ -75,6 +76,11 @@ public class JwtAuthenticationRestController {
     @ExceptionHandler({AuthenticationException.class})
     public ResponseEntity<String> handleAuthenticationException(AuthenticationException e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+    }
+
+    @ExceptionHandler({ExpiredJwtException.class})
+    public ResponseEntity<String> handleExpiredJwtException(ExpiredJwtException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
     private void authenticate(String username, String password) {
