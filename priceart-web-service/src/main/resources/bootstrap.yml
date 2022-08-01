@@ -90,4 +90,4 @@ sicurezza:
     header: Authorization
     prefix: Bearer 
     expiration: 86400
-    secret: 123_Stella
+    secret: $123_Stella@xantrix.it
