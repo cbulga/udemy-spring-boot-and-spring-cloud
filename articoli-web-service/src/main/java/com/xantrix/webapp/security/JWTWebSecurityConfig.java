@@ -2,7 +2,6 @@ package com.xantrix.webapp.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -16,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -26,16 +26,13 @@ public class JWTWebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtAuthorizedResponseAuthenticationEntryPoint jwtAuthorizedResponseAuthenticationEntryPoint;
     private final UserDetailsService userDetailsService;
     private final JwtTokenAuthorizationOncePerRequestFilter jwtAuthenticationTokenFilter;
-    private final String authenticationPath;
 
     public JWTWebSecurityConfig(JwtAuthorizedResponseAuthenticationEntryPoint jwtAuthorizedResponseAuthenticationEntryPoint,
                                 @Qualifier("customUserDetailsService") UserDetailsService userDetailsService,
-                                JwtTokenAuthorizationOncePerRequestFilter jwtAuthenticationTokenFilter,
-                                @Value("${sicurezza.uri}") String authenticationPath) {
+                                JwtTokenAuthorizationOncePerRequestFilter jwtAuthenticationTokenFilter) {
         this.jwtAuthorizedResponseAuthenticationEntryPoint = jwtAuthorizedResponseAuthenticationEntryPoint;
         this.userDetailsService = userDetailsService;
         this.jwtAuthenticationTokenFilter = jwtAuthenticationTokenFilter;
-        this.authenticationPath = authenticationPath;
     }
 
     @Autowired
@@ -44,7 +41,7 @@ public class JWTWebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoderBean() {
+    public static PasswordEncoder passwordEncoderBean() {
         return new BCryptPasswordEncoder();
     }
 
@@ -54,7 +51,6 @@ public class JWTWebSecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
-    private static final String[] NOAUTH_MATCHER = {""};
     private static final String[] USER_MATCHER = {"/api/articoli/cerca/**"};
     private static final String[] ADMIN_MATCHER = {
             "/api/articoli/inserisci/**",
@@ -66,6 +62,7 @@ public class JWTWebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(jwtAuthorizedResponseAuthenticationEntryPoint)
+                .accessDeniedHandler(accessDeniedHandler())
                 .and()
                 .authorizeRequests()
 //                .antMatchers(NOAUTH_MATCHER).permitAll() // endpoint che non richiede autenticazione
@@ -78,9 +75,16 @@ public class JWTWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity webSecurity) {
-        webSecurity.ignoring().antMatchers(HttpMethod.POST, authenticationPath)
-                .antMatchers(HttpMethod.OPTIONS, "/**")
-                .and()
-                .ignoring().antMatchers(HttpMethod.GET, "/");
+        webSecurity.ignoring()
+                .antMatchers(HttpMethod.OPTIONS, "/**");
+		/*
+				.and().ignoring()
+				.antMatchers(HttpMethod.GET, "/");
+				*/
+    }
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return new CustomAccessDeniedHandler();
     }
 }
