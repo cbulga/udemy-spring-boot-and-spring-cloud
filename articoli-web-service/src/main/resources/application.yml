@@ -100,8 +100,10 @@ gestuser:
   srvUrl: http://localhost:8019/api/utenti/cerca/userid/
 
 # ==============================================================
-# = Parametri Sicurezza JWT
+# = Parametri Sicurezza OAUTH2 con KeyCloack
 # ==============================================================
-sicurezza:
-  header: Authorization
-  secret: $123_Stella@xantrix.it
+keycloak:
+  auth-server-url: http://localhost:8080
+  realm: Alphashop
+  resource: Articoli-Web-Service
+  public-client: true

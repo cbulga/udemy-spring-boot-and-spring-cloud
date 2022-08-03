@@ -1,0 +1,73 @@
+version: '3.3'
+
+networks: 
+  ntkeyclk:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.30.0.0/24
+
+services:
+  pgsql:
+    image: postgres:latest
+    restart: unless-stopped
+    container_name: keycloak_postgresql
+    volumes: 
+      - psdb-volume:/var/lib/postgresql/data
+    networks: 
+      ntkeyclk:
+        ipv4_address: 172.30.0.2
+    ports:
+      - target: 5432
+        published: 5432 
+        protocol: tcp
+        mode: host
+    environment:
+      - POSTGRES_PASSWORD=123_Stella
+
+#  pgadmin:
+#    image: dpage/pgadmin4
+#    restart: unless-stopped
+#    container_name: keycloak_pgadmin4
+#
+#    networks:
+#      ntkeyclk:
+#        ipv4_address: 172.30.0.3
+#    ports:
+#      - target: 80
+#        published: 8081
+#        protocol: tcp
+#        mode: host
+#    environment:
+#      - PGADMIN_CONFIG_SERVER_MODE=True
+#      - PGADMIN_DEFAULT_EMAIL=cristian.bulgarelli@gmail.com
+#      - PGADMIN_DEFAULT_PASSWORD=123_Stella
+
+  keycloak:
+    image: bitnami/keycloak:latest
+    restart: unless-stopped
+    container_name: keycloak
+
+    networks: 
+      ntkeyclk:
+        ipv4_address: 172.30.0.5
+    ports:
+      - target: 8080
+        published: 8080
+        protocol: tcp
+        mode: host
+    environment:
+      - KEYCLOAK_DATABASE_HOST=172.30.0.2
+      - KEYCLOAK_DATABASE_PORT=5432
+      - KEYCLOAK_DATABASE_USER=postgres
+      - KEYCLOAK_DATABASE_PASSWORD=123_Stella
+      - KEYCLOAK_ADMIN_USER=Cristian
+      - KEYCLOAK_ADMIN_PASSWORD=AmalaPazzaInterAmala
+    depends_on:
+      - pgsql
+
+
+volumes:
+  psdb-volume:
+
