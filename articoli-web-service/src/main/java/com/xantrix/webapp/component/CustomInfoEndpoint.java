@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Custom actuatot info endpoint
+ * Custom actuator info endpoint
  */
 @Component
 @Endpoint(id = "customInfo")

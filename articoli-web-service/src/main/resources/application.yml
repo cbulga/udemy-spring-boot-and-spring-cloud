@@ -7,6 +7,7 @@ server:
 # ==============================================================
 # = Impostazione SSL
 # ==============================================================
+#  port: 5443
 # SSL DISABILITATO PER ORA...
 #  ssl:
 #    enabled: true
@@ -43,6 +44,8 @@ spring:
 # ==============================================================
 management:
   info:
+    env:
+      enabled: true
     git:
       mode: full
   endpoint:
@@ -82,14 +85,14 @@ logging:
       max-file-size: 1MB
   # Livello del log generale
   level:
-    root: WARN
+    root: INFO
 #    com:
 #      xantrix:
 #        DEBUG
-    org.springframework.security: DEBUG
+    org.springframework.security: WARN
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql: TRACE
-    org.springframework.web: INFO
+    org.springframework.web: WARN
     com.xantrix.webapp: DEBUG
     com.hazelcast: INFO
 
