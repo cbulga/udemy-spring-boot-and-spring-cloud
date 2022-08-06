@@ -1,0 +1,114 @@
+# ==============================================================
+# = PriceArt Web Service con Autenticazione JWT
+# ==============================================================
+server:
+  #port: 5071
+  port: 507${seq}
+
+spring:
+  application:
+    name: PriceArtWebService
+  # ==============================================================
+  # = Proprietà Config Server
+  # ==============================================================
+  cloud:
+    config:
+      # indirizzo riferimento config server
+      uri: http://localhost:8888
+      # profilo attivo
+      profile: ${profilo}
+      # branch git da usare da cui caricare la configurazione del config server
+      #label: list3
+      # username and password to authenticate into the config server
+      username: user
+      password: BimBumBam_2018
+      # if fail-fast is true, the microservice will throw an exception during startup when it does not authenticate successfully in the config server
+      fail-fast: true
+  # ==============================================================
+  # = Proprietà RabbitMQ
+  # ==============================================================
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: rabbitmq
+    password: rabbitmq
+  # ==============================================================
+  # = Proprietà Fonte Dati PostgreSQL
+  # ==============================================================
+  datasource:
+    initialization-mode: always
+    password: 123_Stella
+    platform: postgres
+    url: jdbc:postgresql://localhost:5433/AlphaShop
+    username: postgres
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          lob:
+            non_contextual_creation: true
+        format_sql: true
+    show-sql: true
+    
+# ==============================================================
+# = Actuator Parameters
+# ==============================================================
+management:
+  endpoint:
+    health:
+      show-details: WHEN_AUTHORIZED
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,refresh,bus-refresh
+        
+# ==============================================================
+# = Actuator Info
+# ==============================================================
+info:
+  assistenza:
+    nome: "Cristian Bulgarelli"
+  nome:
+    nome-app: "PriceArt Web Service - Versione Autenticazione OAuth2 (Keycloak)"
+
+# ==============================================================
+# = Parametri Sicurezza OAUTH2 con KeyCloack
+# ==============================================================
+keycloak:
+  auth-server-url: http://localhost:8080
+  realm: Alphashop
+  resource: Articoli-Web-Service
+  public-client: true
+
+# ==============================================================
+# = Proprietà Livello Log
+# = Default ERROR, WARN e INFO
+# = Levels: TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF
+# ==============================================================
+logging:
+  file:
+    name: "/home/cristian/tmp/Udemy/spring-cloud-course/logs/ArtSrv.log"
+  pattern:
+    file: "%d{ dd-MM-yyyy } [%thread] %-5level %logger{36} - %msg%n"
+    #    console: "%d{dd-MM-yyyy HH:mm:ss} - %msg%n"
+    console: "%d{dd.MM.yyyy HH:mm:ss.SSS} %-5p - [%C]:%m%n"
+
+  logback:
+    rollingpolicy:
+      max-file-size: 1MB
+  # Livello del log generale
+  level:
+    root: INFO
+    #    com:
+    #      xantrix:
+    #        DEBUG
+    org.springframework.security: WARN
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
+    org.springframework.web: WARN
+    com.xantrix.webapp: DEBUG
+    com.hazelcast: DEBUG
+#    org.springframework: DEBUG
