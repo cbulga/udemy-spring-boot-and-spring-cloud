@@ -1,0 +1,107 @@
+# ==============================================================
+# = Articoli Web Service - Versione Base
+# ==============================================================
+
+server:
+  port: 5051
+# ==============================================================
+# = Impostazione SSL
+# ==============================================================
+# SSL DISABILITATO PER ORA...
+#  ssl:
+#    enabled: true
+#    key-store-type: PKCS12
+#    key-store: classpath:ssl-server.jks
+#    key-store-password: 123_Stella
+
+spring:
+  application:
+    name: ProductsWebService
+# ==============================================================
+# = DBMS PostgreSQL Parameters
+# ==============================================================
+  datasource:
+    initialization-mode: always
+    password: 123_Stella
+    platform: postgres
+    url: jdbc:postgresql://localhost:5433/AlphaShop
+    username: postgres
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+    show-sql: true
+
+# ==============================================================
+# = Actuator Parameters
+# ==============================================================
+management:
+  info:
+    git:
+      mode: full
+  endpoint:
+    health:
+      show-details: WHEN_AUTHORIZED
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,customInfo
+# ==============================================================
+# = Actuator Info
+# ==============================================================
+info:
+  assistenza:
+    nome: "Cristian Bulgarelli"
+    mail: "cristian.bulgarelli@gmail.com"
+    telefono: "3489227531"
+    orario: "9-18"
+  nome:
+    nome-app: "Articoli Web Service - Versione Autenticazione JWT"
+
+# ==============================================================
+# = Proprietà Livello Log
+# = Default ERROR, WARN e INFO
+# = Levels: TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF
+# ==============================================================
+logging:
+  file:
+    name: "/home/cristian/tmp/Udemy/spring-cloud-course/logs/ArtSrv.log"
+  pattern:
+    file: "%d{ dd-MM-yyyy } [%thread] %-5level %logger{36} - %msg%n"
+#    console: "%d{dd-MM-yyyy HH:mm:ss} - %msg%n"
+    console: "%d{dd.MM.yyyy HH:mm:ss.SSS} %-5p - [%C]:%m%n"
+
+  logback:
+    rollingpolicy:
+      max-file-size: 1MB
+  # Livello del log generale
+  level:
+    root: WARN
+#    com:
+#      xantrix:
+#        DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
+    org.springframework.web: INFO
+    com.xantrix.webapp: DEBUG
+    com.hazelcast: INFO
+
+# Opzioni accesso servizio gestUser
+gestuser:
+  userId: Cristian
+  password: 123Stella
+  srvUrl: http://localhost:8019/api/utenti/cerca/userid/
+
+# ==============================================================
+# = Parametri Sicurezza JWT
+# ==============================================================
+sicurezza:
+  header: Authorization
+  secret: $123_Stella@xantrix.it
