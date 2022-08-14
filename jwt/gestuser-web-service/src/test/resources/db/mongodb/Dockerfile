@@ -1,6 +1,6 @@
 FROM ubuntu:18.04
 
-LABEL Cristian Bulgarelli <cristian.bulgarelli@gmail.com> 
+LABEL maintainer="Cristian Bulgarelli <cristian.bulgarelli@gmail.com>"
 
 #Si installa la versione 3 di Mongodb
 RUN apt-get update && apt-get install -y mongodb && apt-get install nano
