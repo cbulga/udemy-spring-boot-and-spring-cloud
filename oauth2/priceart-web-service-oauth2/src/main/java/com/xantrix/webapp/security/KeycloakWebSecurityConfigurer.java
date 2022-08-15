@@ -48,19 +48,20 @@ class KeycloakWebSecurityConfigurer extends KeycloakWebSecurityConfigurerAdapter
 
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers(USER_MATCHER).hasAnyRole("user", "User")
                 .antMatchers(ADMIN_MATCHER).hasAnyRole("admin", "Admin")
+                .antMatchers(USER_MATCHER).hasAnyRole("user", "User")
+                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling()
                 .accessDeniedHandler(accessDeniedHandler());
     }
 
-    @Override
-    public void configure(WebSecurity webSecurity) {
-        webSecurity.ignoring()
-                .antMatchers(HttpMethod.OPTIONS, "/**");
-    }
+//    @Override
+//    public void configure(WebSecurity webSecurity) {
+//        webSecurity.ignoring()
+//                .antMatchers(HttpMethod.OPTIONS, "/**");
+//    }
 
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
