@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -59,8 +60,9 @@ public class PrezziController {
     // ------------------- SELECT PREZZO CODART ------------------------------------
     @Operation(
             summary = "Ricerca il PREZZO dell'articolo selezionato",
-            description = "pprevede il parametro opzionale idlist",
-            tags = {"Prezzi"})
+            description = "prevede il parametro opzionale idlist",
+            tags = {"Prezzi"},
+            security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses(value =
             {@ApiResponse(responseCode = "200", description = "Il Prezzo è stato trovato!"),
             })

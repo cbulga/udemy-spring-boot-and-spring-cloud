@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -41,6 +40,16 @@ class KeycloakWebSecurityConfigurer extends KeycloakWebSecurityConfigurerAdapter
             "/api/prezzi/elimina/**",
             "/api/listino/inserisci/**",
             "/api/listino/elimina/**"};
+    private static final String[] NOAUTH_MATCHER = {
+            "/v3/api-docs/**",        // swagger
+            "/webjars/**",            // swagger-ui webjars
+            "/swagger-resources/**",  // swagger-ui resources
+            "/configuration/**",      // swagger configuration
+            "/swagger-ui.html",
+            "/favicon.ico",
+            "/**/*.html",
+            "/**/*.css",
+            "/**/*.js"};
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -51,6 +60,7 @@ class KeycloakWebSecurityConfigurer extends KeycloakWebSecurityConfigurerAdapter
                 .antMatchers(ADMIN_MATCHER).hasAnyRole("admin", "Admin")
                 .antMatchers(USER_MATCHER).hasAnyRole("user", "User")
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .antMatchers(HttpMethod.GET, NOAUTH_MATCHER).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling()

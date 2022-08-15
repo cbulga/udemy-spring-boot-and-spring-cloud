@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -55,8 +56,10 @@ public class ArticoliController {
         this.errMessage = errMessage;
     }
 
-    @Operation(summary = "Ricerca l'articolo per BARCODE", description = "Restituisce i dati dell'articolo in formato JSON",
-            tags = {"Articoli"})
+    @Operation(summary = "Ricerca l'articolo per BARCODE",
+            description = "Restituisce i dati dell'articolo in formato JSON",
+            tags = {"Articoli"},
+            security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "L'articolo cercato è stato trovato!",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = Articoli.class))),
@@ -80,7 +83,10 @@ public class ArticoliController {
     }
 
     // ------------------- Ricerca Per Codice ------------------------------------
-    @Operation(summary = "Ricerca l'articolo per CODICE", description = "Restituisce i dati dell'articolo in formato JSON", tags = {"Articoli"})
+    @Operation(summary = "Ricerca l'articolo per CODICE",
+            description = "Restituisce i dati dell'articolo in formato JSON",
+            tags = {"Articoli"},
+            security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "L'articolo cercato è stato trovato!", content = @Content(schema = @Schema(implementation = Articoli.class))),
             @ApiResponse(responseCode = "401", description = "Utente non AUTENTICATO", content = @Content),
@@ -101,7 +107,10 @@ public class ArticoliController {
     }
 
     // ------------------- Ricerca Per Descrizione ------------------------------------
-    @Operation(summary = "Ricerca uno o più articoli per descrizione o parte", description = "Restituisce i dati dell'articolo in formato JSON", tags = {"Articoli"})
+    @Operation(summary = "Ricerca uno o più articoli per descrizione o parte",
+            description = "Restituisce i dati dell'articolo in formato JSON",
+            tags = {"Articoli"},
+            security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "L'articolo/i cercato/i sono stati trovati!", content = @Content(schema = @Schema(implementation = Articoli.class))),
             @ApiResponse(responseCode = "401", description = "Utente non AUTENTICATO", content = @Content),
@@ -124,7 +133,8 @@ public class ArticoliController {
     @Operation(
             summary = "Inserimento dati NUOVO articolo",
             description = "Può essere usato solo per l'inserimento dati di un nuovo articolo",
-            tags = {"Articoli"})
+            tags = {"Articoli"},
+            security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses(value =
             {@ApiResponse(responseCode = "200", description = "Dati articolo salvati con successo"),
                     @ApiResponse(responseCode = "400", description = "Uno o più dati articolo non validi"),
@@ -166,7 +176,8 @@ public class ArticoliController {
     @Operation(
             summary = "MODIFICA dati articolo in anagrfica",
             description = "Può essere usato solo per la modifica dati di un articolo presente in anagrafica",
-            tags = {"Articoli"})
+            tags = {"Articoli"},
+            security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses(value =
             {@ApiResponse(responseCode = "200", description = "Dati articolo salvati con successo"),
                     @ApiResponse(responseCode = "400", description = "Uno o più dati articolo non validi"),
@@ -207,7 +218,8 @@ public class ArticoliController {
     @Operation(
             summary = "ELIMINAZIONE dati articolo in anagrfica",
             description = "Si esegue una eliminazione a cascata dei barcode e degli ingredienti",
-            tags = {"Articoli"})
+            tags = {"Articoli"},
+            security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses(value =
             {@ApiResponse(responseCode = "200", description = "Dati articolo eliminati con successo"),
                     @ApiResponse(responseCode = "404", description = "Articolo non presente in anagrafica"),
