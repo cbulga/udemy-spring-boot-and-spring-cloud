@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
 
 @Configuration
 @Slf4j
@@ -37,7 +38,7 @@ public class BasicSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .withUser("user")
                 .password(new BCryptPasswordEncoder().encode(decryptString(user_password)))
                 .roles("USER")
-            .and()
+                .and()
                 .withUser("admin")
                 .password(new BCryptPasswordEncoder().encode(decryptString(admin_password)))
                 .roles("USER", "ACTUATOR");
@@ -48,10 +49,18 @@ public class BasicSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.csrf()
                 .disable()
                 .httpBasic()
-            .and()
+                .and()
                 .authorizeRequests()
                 .antMatchers("/actuator/**").hasAuthority("ROLE_ACTUATOR")
-                .antMatchers("/**").hasAuthority("ROLE_USER");
+                .antMatchers("/**").hasAuthority("ROLE_USER")
+                .and()
+                .exceptionHandling()
+                .accessDeniedHandler(accessDeniedHandler());
+    }
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return new CustomAccessDeniedHandler();
     }
 
     protected String decryptString(String passwordToDecrypt) {
