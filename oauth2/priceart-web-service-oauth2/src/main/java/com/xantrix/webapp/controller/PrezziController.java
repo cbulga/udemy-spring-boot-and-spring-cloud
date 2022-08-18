@@ -67,6 +67,8 @@ public class PrezziController {
             {@ApiResponse(responseCode = "200", description = "Il Prezzo è stato trovato!"),
             })
     @GetMapping(value = {"/{codart}/{idlist}", "/{codart}"})
+    // RefreshScope: per fare in modo che questo bean (metodo del bean) possa essere refreshato a runtime quando c'e'
+    //               un cambio configurazione, creando una nuova istanza di bean che abbia recepito la nuova configurazione (con il nuovo sconto)
     @RefreshScope
     public double getPriceCodArt(@Parameter(description = "Codice Articolo", required = true) @PathVariable("codart") String codArt,
                                  @Parameter(description = "ID Listino") @PathVariable("idlist") Optional<String> optIdList) {
