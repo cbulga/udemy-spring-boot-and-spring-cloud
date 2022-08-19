@@ -33,6 +33,11 @@ logging:
   level:
     org.springframework.cloud: DEBUG
     org.springframework.security: DEBUG
+    com.xantrix: DEBUG
+
+sicurezza:
+  userpwd: ${uspwd}
+  adminpwd: ${adpwd}
 
 jasypt:
   encryptor:

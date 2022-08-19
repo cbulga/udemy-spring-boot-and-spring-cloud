@@ -13,13 +13,3 @@ spring:
   config:
     activate:
       on-profile: git
-
-# ==============================================================
-# = Actuator Info
-# ==============================================================
-info:
-  assistenza:
-    nome: "Cristian Bulgarelli"
-  nome:
-    nome-app: "Config-Server"
-    profilo: "GIT"

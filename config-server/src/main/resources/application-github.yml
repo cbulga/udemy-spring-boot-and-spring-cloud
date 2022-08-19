@@ -17,14 +17,4 @@ spring:
           password: <password serve solo se repository privato, se pubblico è accessibile a chiunque>
           cloneOnStart: true
           timeout: 4 # in seconds
-
-# ==============================================================
-# = Actuator Info
-# ==============================================================
-info:
-  assistenza:
-    nome: "Cristian Bulgarelli"
-  nome:
-    nome-app: "Config-Server"
-    profilo: "GITHUB"
           

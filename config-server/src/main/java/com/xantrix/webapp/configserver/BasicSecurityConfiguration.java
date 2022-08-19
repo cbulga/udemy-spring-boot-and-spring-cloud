@@ -16,10 +16,10 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 @Slf4j
 public class BasicSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    @Value("${userpwd}")
+    @Value("${sicurezza.userpwd}")
     String user_password;
 
-    @Value("${adminpwd}")
+    @Value("${sicurezza.adminpwd}")
     String admin_password;
 
     @Value("${jasypt.encryptor.password}")
@@ -69,6 +69,7 @@ public class BasicSecurityConfiguration extends WebSecurityConfigurerAdapter {
         return decryptor.decrypt(passwordToDecrypt);
     }
 
+    @SuppressWarnings("unused")
     protected String encrypt(String stringToEncrypt) {
         StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
         encryptor.setPassword(this.password);
