@@ -59,27 +59,28 @@ spring:
             non_contextual_creation: true
         format_sql: true
     show-sql: true
-    
-# ==============================================================
-# = Actuator Parameters
-# ==============================================================
-management:
-  endpoint:
-    health:
-      show-details: WHEN_AUTHORIZED
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics,refresh,bus-refresh
-        
-# ==============================================================
-# = Actuator Info
-# ==============================================================
-info:
-  assistenza:
-    nome: "Cristian Bulgarelli"
-  nome:
-    nome-app: "PriceArt Web Service - Versione Autenticazione OAuth2 (Keycloak)"
+
+# Actuator Parameters e Actuator Info arrivano dal config-server
+## ==============================================================
+## = Actuator Parameters
+## ==============================================================
+#management:
+#  endpoint:
+#    health:
+#      show-details: WHEN_AUTHORIZED
+#  endpoints:
+#    web:
+#      exposure:
+#        include: health,info,metrics,refresh,bus-refresh
+#
+## ==============================================================
+## = Actuator Info
+## ==============================================================
+#info:
+#  assistenza:
+#    nome: "Cristian Bulgarelli"
+#  nome:
+#    nome-app: "PriceArt Web Service - Versione Autenticazione OAuth2 (Keycloak)"
 
 # ==============================================================
 # = Parametri Sicurezza OAUTH2 con KeyCloack
