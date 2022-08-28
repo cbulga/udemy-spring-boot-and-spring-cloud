@@ -22,7 +22,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 //@TestPropertySource(locations="classpath:application-list1.properties")
 //@ContextConfiguration(classes = Application.class)
-@TestPropertySource(properties = {"profilo = std2", "seq = 1"})
+@SuppressWarnings("SpringBootApplicationProperties")
+@TestPropertySource(properties = {"profilo = std2", "seq = 1", "ramo = "})
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class PrezziRepositoryTest {
@@ -77,6 +78,7 @@ class PrezziRepositoryTest {
                 .isNull();
     }
 
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
     @Test
     @Order(4)
     void testDeleteListino() {

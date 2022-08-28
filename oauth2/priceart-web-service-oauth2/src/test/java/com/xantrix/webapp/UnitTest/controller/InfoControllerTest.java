@@ -20,7 +20,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Integration test: config server needs to be started
  */
-@TestPropertySource(properties = {"profilo=list100", "seq=1"})
+@SuppressWarnings("SpringBootApplicationProperties")
+@TestPropertySource(properties = {"profilo = list100", "seq = 1", "ramo = "})
 @ContextConfiguration(classes = Application.class)
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)

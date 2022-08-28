@@ -20,10 +20,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Integration test: config server needs to be started
  */
+@SuppressWarnings("SpringBootApplicationProperties")
 @ContextConfiguration(classes = Application.class)
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@TestPropertySource(properties = {"profilo = list100", "seq = 1"})
+@TestPropertySource(properties = {"profilo = list100", "seq = 1", "ramo = main"})
 public class ListiniControllerTest {
 
     private MockMvc mockMvc;

@@ -19,6 +19,7 @@ spring:
       profile: ${profilo}
       # branch git da usare da cui caricare la configurazione del config server
       #label: list3
+      label: ${ramo}
       # username and password to authenticate into the config server
       username: user
       password: BimBumBam_2018
@@ -43,9 +44,7 @@ spring:
   # = Proprietà Fonte Dati PostgreSQL
   # ==============================================================
   datasource:
-    initialization-mode: always
     password: 123_Stella
-    platform: postgres
     url: jdbc:postgresql://localhost:5433/AlphaShop
     username: postgres
   jpa:
@@ -59,6 +58,10 @@ spring:
             non_contextual_creation: true
         format_sql: true
     show-sql: true
+  sql:
+    init:
+      mode: always
+      platform: postgres
 
 # Actuator Parameters e Actuator Info arrivano dal config-server
 ## ==============================================================
