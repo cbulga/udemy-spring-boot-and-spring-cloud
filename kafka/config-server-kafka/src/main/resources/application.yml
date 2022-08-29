@@ -1,0 +1,61 @@
+# ==================================================================================================
+# = Config Server Base - Kafka as message broker to share the configuration with other microservices
+# ==================================================================================================
+server:
+  port: 8888
+
+# ==============================================================
+# = Profilo Attivo
+# ==============================================================
+spring:
+  application:
+    name: config-server-kafka
+  config:
+    use-legacy-processing: false
+  profiles:
+    active: github
+  # ==============================================================
+  # = Bus Parameters
+  # ==============================================================
+  cloud:
+    bus:
+      #id: ${spring.application.name}:${spring.profiles.active}:${random.uuid}
+      enabled: true
+  kafka:
+    bootstrap-servers:
+    - ${KAFKA_ADDR:http://localhost:29092}
+    client-id: ${spring.application.name}:${spring.profiles.active}:${random.uuid}
+# ==============================================================
+# = Actuator Parameters
+# ==============================================================
+management:
+  info:
+    env:
+      enabled: true
+  endpoint:
+    health:
+      show-details: WHEN_AUTHORIZED
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,refresh,bus-refresh,bus-env
+
+#endpoint: http://localhost:8888/{application-name}/{profile}[/{label}]
+
+# ==============================================================
+# = Logs Parameters
+# ==============================================================
+logging:
+  level:
+    org.springframework.cloud: DEBUG
+    org.springframework.security: DEBUG
+    com.xantrix: DEBUG
+
+sicurezza:
+  userpwd: ${uspwd}
+  adminpwd: ${adpwd}
+
+jasypt:
+  encryptor:
+    # password passata come variabile da linea di comando al comando mvn di build per produrre un jar con già valorizzata questa property. Es.: mvn clean install -Denpwd=123_Stella.
+    password: ${enpwd}

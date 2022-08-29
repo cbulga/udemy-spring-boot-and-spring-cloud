@@ -1,0 +1,15 @@
+# ==============================================================
+# = Authentication Server - Autenticazione OAuth2 (Keycloak)
+# = Profilo GIT
+# ==============================================================
+spring:
+  application:
+    name: config-server-kafka-git
+  cloud:
+    config:
+      server:
+        git:
+          uri: file:///home/cristian/git_repo/udemy/udemy-spring-boot-and-spring-cloud-git-config-repository
+  config:
+    activate:
+      on-profile: git
