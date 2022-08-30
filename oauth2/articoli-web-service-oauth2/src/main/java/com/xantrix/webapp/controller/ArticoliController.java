@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.HttpHeaders;
@@ -27,6 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
@@ -51,9 +53,12 @@ public class ArticoliController {
 
     private final ResourceBundleMessageSource errMessage;
 
-    public ArticoliController(ArticoliService articoliService, ResourceBundleMessageSource errMessage) {
+    private final PriceClient priceClient;
+
+    public ArticoliController(ArticoliService articoliService, ResourceBundleMessageSource errMessage, PriceClient priceClient) {
         this.articoliService = articoliService;
         this.errMessage = errMessage;
+        this.priceClient = priceClient;
     }
 
     @Operation(summary = "Ricerca l'articolo per BARCODE",
@@ -93,7 +98,8 @@ public class ArticoliController {
             @ApiResponse(responseCode = "403", description = "Utente Non AUTORIZZATO ad accedere alle informazioni", content = @Content),
             @ApiResponse(responseCode = "404", description = "L'articolo cercato NON è stato trovato!", content = @Content)})
     @GetMapping(value = "/cerca/codice/{codArt}", produces = "application/json")
-    public ResponseEntity<ArticoliDto> listArtByCodArt(@Parameter(description = "Codice univoco dell'articolo", required = true) @PathVariable("codArt") String codArt) throws NotFoundException {
+    public ResponseEntity<ArticoliDto> listArtByCodArt(@Parameter(description = "Codice univoco dell'articolo", required = true) @PathVariable("codArt") String codArt,
+                                                       HttpServletRequest httpServletRequest) throws NotFoundException {
         log.info("****** Otteniamo l'articolo con codice {} ******", codArt);
         ArticoliDto articolo = articoliService.selByCodArt(codArt);
 
@@ -101,6 +107,9 @@ public class ArticoliController {
             String errorMessage = String.format(ARTICOLO_NON_TROVATO, codArt);
             log.warn(errorMessage);
             throw new NotFoundException(errorMessage);
+        } else {
+            String authHeader = httpServletRequest.getHeader("Authorization");
+            articolo.setPrezzo(getPriceArt(authHeader, codArt, null));
         }
 
         return new ResponseEntity<>(articolo, HttpStatus.OK);
@@ -246,5 +255,14 @@ public class ArticoliController {
         result.put("code", HttpStatus.OK.toString());
         result.put("message", String.format(ELIMINAZIONE_ARTICOLO_ESEGUITA_CON_SUCCESSO, codArt));
         return new ResponseEntity<>(result, headers, HttpStatus.OK);
+    }
+
+    protected double getPriceArt(String authHeader, String codArt, String idList) {
+        double prezzo = StringUtils.isNotEmpty(idList)
+                ? priceClient.getPriceArt(authHeader, codArt, idList)
+                : priceClient.getDefPriceArt(authHeader, codArt);
+
+        log.info("Prezzo articolo {}: {}", codArt, prezzo);
+        return prezzo;
     }
 }
