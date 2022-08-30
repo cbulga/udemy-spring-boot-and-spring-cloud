@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/articoli")
@@ -72,9 +73,11 @@ public class ArticoliController {
             @ApiResponse(responseCode = "403", description = "Utente Non AUTORIZZATO ad accedere alle informazioni", content = @Content),
             @ApiResponse(responseCode = "404", description = "L'articolo cercato NON è stato trovato!",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
-    @GetMapping(value = "/cerca/ean/{barCode}", produces = "application/json")
+    @GetMapping(value = {"/cerca/ean/{barCode}", "/cerca/ean/{barCode}/{idlist}"}, produces = "application/json")
     // ---------------------- Ricerca per barcode -----------------------------
-    public ResponseEntity<ArticoliDto> listArtByEan(@Parameter(description = "Barcode Articolo", required = true) @PathVariable("barCode") String barCode) throws NotFoundException {
+    public ResponseEntity<ArticoliDto> listArtByEan(@Parameter(description = "Barcode Articolo", required = true) @PathVariable("barCode") String barCode,
+                                                    @PathVariable("idlist") Optional<String> optIdList,
+                                                    HttpServletRequest httpServletRequest) throws NotFoundException {
         log.info("****** Otteniamo l'articolo con barcode {} ******", barCode);
         ArticoliDto articolo = articoliService.selByBarCode(barCode);
 
@@ -82,6 +85,9 @@ public class ArticoliController {
             String errorMessage = String.format(BARCODE_NOT_FOUND, barCode);
             log.warn(errorMessage, barCode);
             throw new NotFoundException(errorMessage);
+        } else {
+            String authHeader = httpServletRequest.getHeader("Authorization");
+            articolo.setPrezzo(getPriceArt(authHeader, articolo.getCodArt(), optIdList.orElse(null)));
         }
 
         return new ResponseEntity<>(articolo, HttpStatus.OK);
@@ -97,8 +103,9 @@ public class ArticoliController {
             @ApiResponse(responseCode = "401", description = "Utente non AUTENTICATO", content = @Content),
             @ApiResponse(responseCode = "403", description = "Utente Non AUTORIZZATO ad accedere alle informazioni", content = @Content),
             @ApiResponse(responseCode = "404", description = "L'articolo cercato NON è stato trovato!", content = @Content)})
-    @GetMapping(value = "/cerca/codice/{codArt}", produces = "application/json")
+    @GetMapping(value = {"/cerca/codice/{codArt}", "/cerca/codice/{codArt}/{idlist}"}, produces = "application/json")
     public ResponseEntity<ArticoliDto> listArtByCodArt(@Parameter(description = "Codice univoco dell'articolo", required = true) @PathVariable("codArt") String codArt,
+                                                       @PathVariable("idlist") Optional<String> optIdList,
                                                        HttpServletRequest httpServletRequest) throws NotFoundException {
         log.info("****** Otteniamo l'articolo con codice {} ******", codArt);
         ArticoliDto articolo = articoliService.selByCodArt(codArt);
@@ -109,7 +116,7 @@ public class ArticoliController {
             throw new NotFoundException(errorMessage);
         } else {
             String authHeader = httpServletRequest.getHeader("Authorization");
-            articolo.setPrezzo(getPriceArt(authHeader, codArt, null));
+            articolo.setPrezzo(getPriceArt(authHeader, codArt, optIdList.orElse(null)));
         }
 
         return new ResponseEntity<>(articolo, HttpStatus.OK);
@@ -125,14 +132,19 @@ public class ArticoliController {
             @ApiResponse(responseCode = "401", description = "Utente non AUTENTICATO", content = @Content),
             @ApiResponse(responseCode = "403", description = "Utente Non AUTORIZZATO ad accedere alle informazioni", content = @Content),
             @ApiResponse(responseCode = "404", description = "L'articolo/i cercato/i NON sono stati trovati!", content = @Content)})
-    @GetMapping(value = "/cerca/descrizione/{descrizione}", produces = "application/json")
-    public ResponseEntity<List<ArticoliDto>> listArtByDescrizione(@Parameter(description = "Descrizione dell'articolo", required = true) @PathVariable("descrizione") String descrizione) throws NotFoundException {
+    @GetMapping(value = {"/cerca/descrizione/{descrizione}", "/cerca/descrizione/{descrizione}/{idlist}"}, produces = "application/json")
+    public ResponseEntity<List<ArticoliDto>> listArtByDescrizione(@Parameter(description = "Descrizione dell'articolo", required = true) @PathVariable("descrizione") String descrizione,
+                                                                  @PathVariable("idlist") Optional<String> optIdList,
+                                                                  HttpServletRequest httpServletRequest) throws NotFoundException {
         log.info("****** Otteniamo gli articoli con descrizione {} ******", descrizione);
         List<ArticoliDto> articoli = articoliService.selByDescrizione(descrizione + "%");
         if (articoli.isEmpty()) {
             String errorMessage = String.format(ARTICOLO_PER_DESCRIZIONE_NON_TROVATO, descrizione);
             log.warn(errorMessage);
             throw new NotFoundException(errorMessage);
+        } else {
+            String authHeader = httpServletRequest.getHeader("Authorization");
+            articoli.forEach(a -> a.setPrezzo(getPriceArt(authHeader, a.getCodArt(), optIdList.orElse(null))));
         }
 
         return new ResponseEntity<>(articoli, HttpStatus.OK);
