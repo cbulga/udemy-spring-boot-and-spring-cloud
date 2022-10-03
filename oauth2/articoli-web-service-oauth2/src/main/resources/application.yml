@@ -95,6 +95,7 @@ logging:
     org.springframework.web: WARN
     com.xantrix.webapp: DEBUG
     com.hazelcast: INFO
+    com.xantrix.webapp.feign.PriceClient: DEBUG
 
 # Opzioni accesso servizio gestUser
 gestuser:
