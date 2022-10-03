@@ -70,7 +70,7 @@ public class PrezziController {
     // RefreshScope: per fare in modo che questo bean (metodo del bean) possa essere refreshato a runtime quando c'e'
     //               un cambio configurazione, creando una nuova istanza di bean che abbia recepito la nuova configurazione (con il nuovo sconto)
     @RefreshScope
-    public double getPriceCodArt(@Parameter(description = "Codice Articolo", required = true) @PathVariable("codart") String codArt,
+    public ResponseEntity<Double> getPriceCodArt(@Parameter(description = "Codice Articolo", required = true) @PathVariable("codart") String codArt,
                                  @Parameter(description = "ID Listino") @PathVariable("idlist") Optional<String> optIdList) {
         double retVal = 0;
 
@@ -86,10 +86,12 @@ public class PrezziController {
             if (sconto > 0)
                 log.info("Attivato sconto {}%", sconto);
             retVal = Math.round(prezzo.getPrezzo() * (1 - (sconto / 100)) * 100) / 100.0;
-        } else
+        } else {
             log.warn("Prezzo Articolo Assente!!");
+            return new ResponseEntity<>(retVal, HttpStatus.NOT_FOUND);
+        }
 
-        return retVal;
+        return new ResponseEntity<>(retVal, HttpStatus.OK);
     }
 
     // ------------------- DELETE PREZZO LISTINO ------------------------------------

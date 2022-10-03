@@ -8,7 +8,9 @@ import com.xantrix.webapp.exception.BindingException;
 import com.xantrix.webapp.exception.DuplicateException;
 import com.xantrix.webapp.exception.ErrorResponse;
 import com.xantrix.webapp.exception.NotFoundException;
+import com.xantrix.webapp.feign.PriceClient;
 import com.xantrix.webapp.service.ArticoliService;
+import feign.FeignException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -49,6 +51,7 @@ public class ArticoliController {
     public static final String ARTICOLO_PER_DESCRIZIONE_NON_TROVATO = "Non è stato trovato alcun articolo avente descrizione %s";
     public static final String ARTICOLO_DUPLICATO_IMPOSSIBILE_UTILIZZARE_IL_METODO_POST = "Articolo %s presente in anagrafica! Impossibile utilizzare il metodo POST";
     public static final String INSERIMENTO_ARTICOLO_ESEGUITO_CON_SUCCESSO = "Inserimento Articolo %s Eseguito Con Successo";
+    public static final String AUTHORIZATION = "Authorization";
 
     private final ArticoliService articoliService;
 
@@ -86,7 +89,7 @@ public class ArticoliController {
             log.warn(errorMessage, barCode);
             throw new NotFoundException(errorMessage);
         } else {
-            String authHeader = httpServletRequest.getHeader("Authorization");
+            String authHeader = httpServletRequest.getHeader(AUTHORIZATION);
             articolo.setPrezzo(getPriceArt(authHeader, articolo.getCodArt(), optIdList.orElse(null)));
         }
 
@@ -270,11 +273,20 @@ public class ArticoliController {
     }
 
     protected double getPriceArt(String authHeader, String codArt, String idList) {
-        double prezzo = StringUtils.isNotEmpty(idList)
-                ? priceClient.getPriceArt(authHeader, codArt, idList)
-                : priceClient.getDefPriceArt(authHeader, codArt);
+        double prezzo = 0;
 
-        log.info("Prezzo articolo {}: {}", codArt, prezzo);
+        try {
+            ResponseEntity<Double> result = StringUtils.isNotEmpty(idList)
+                    ? priceClient.getPriceArt(authHeader, codArt, idList)
+                    : priceClient.getDefPriceArt(authHeader, codArt);
+            if (!result.getStatusCode().equals(HttpStatus.NOT_FOUND))
+                prezzo = result.getBody();
+
+            log.info("Prezzo articolo {}: {}", codArt, prezzo);
+        } catch (FeignException ex) {
+            log.warn("Errore: {}", ex.getLocalizedMessage());
+        }
+
         return prezzo;
     }
 }
