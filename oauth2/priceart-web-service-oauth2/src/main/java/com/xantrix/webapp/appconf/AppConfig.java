@@ -11,4 +11,5 @@ public class AppConfig {
 
     private String listino;
     private Double sconto = 0.00;
+    private int tipo;
 }

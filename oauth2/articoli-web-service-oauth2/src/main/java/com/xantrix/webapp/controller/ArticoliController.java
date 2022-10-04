@@ -3,6 +3,7 @@ package com.xantrix.webapp.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.xantrix.webapp.dtos.ArticoliDto;
+import com.xantrix.webapp.dtos.PrezzoDto;
 import com.xantrix.webapp.entities.Articoli;
 import com.xantrix.webapp.exception.BindingException;
 import com.xantrix.webapp.exception.DuplicateException;
@@ -276,13 +277,25 @@ public class ArticoliController {
         double prezzo = 0;
 
         try {
-            ResponseEntity<Double> result = StringUtils.isNotEmpty(idList)
-                    ? priceClient.getPriceArt(authHeader, codArt, idList)
-                    : priceClient.getDefPriceArt(authHeader, codArt);
-            if (!result.getStatusCode().equals(HttpStatus.NOT_FOUND))
-                prezzo = result.getBody();
-
-            log.info("Prezzo articolo {}: {}", codArt, prezzo);
+            ResponseEntity<PrezzoDto> result = StringUtils.isNotEmpty(idList)
+                    ? priceClient.getPriceArt2(authHeader, codArt, idList)
+                    : priceClient.getDefPriceArt2(authHeader, codArt);
+            PrezzoDto prezzoDto = result.getBody();
+            log.info("Prezzo articolo {}: {}", prezzoDto.getCodArt(), prezzoDto.getPrezzo());
+            if (prezzoDto.getSconto() > 0) {
+                log.info("Attivato sconto: {}%", prezzoDto.getSconto());
+                prezzo = prezzoDto.getPrezzo() * (1 - (prezzoDto.getSconto() / 100));
+                prezzo *= 100;
+                prezzo = Math.round(prezzo);
+                prezzo /= 100;
+            }
+//            ResponseEntity<Double> result = StringUtils.isNotEmpty(idList)
+//                    ? priceClient.getPriceArt(authHeader, codArt, idList)
+//                    : priceClient.getDefPriceArt(authHeader, codArt);
+//            if (!result.getStatusCode().equals(HttpStatus.NOT_FOUND))
+//                prezzo = result.getBody();
+//
+//            log.info("Prezzo articolo {}: {}", codArt, prezzo);
         } catch (FeignException ex) {
             log.warn("Errore: {}", ex.getLocalizedMessage());
         }

@@ -3,6 +3,7 @@ package com.xantrix.webapp.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.xantrix.webapp.appconf.AppConfig;
+import com.xantrix.webapp.dtos.PrezzoDto;
 import com.xantrix.webapp.entity.DettListini;
 import com.xantrix.webapp.service.PrezziService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -92,6 +93,36 @@ public class PrezziController {
         }
 
         return new ResponseEntity<>(retVal, HttpStatus.OK);
+    }
+
+    @RefreshScope
+    @GetMapping(value = {"info/{codart}/{idlist}", "info/{codart}"})
+    public ResponseEntity<PrezzoDto> getPriceCodArt2(@PathVariable("codart") String CodArt,
+                                                     @PathVariable("idlist") Optional<String> optIdList) {
+        PrezzoDto retVal = new PrezzoDto();
+
+        String idList = (optIdList.isPresent()) ? optIdList.get() : config.getListino();
+
+        log.info("Listino di Riferimento: " + idList);
+
+        DettListini prezzo = prezziService.selPrezzo(CodArt, idList);
+
+        if (prezzo != null) {
+            log.info("Prezzo Articolo: " + prezzo.getPrezzo());
+
+            double sconto = config.getSconto();
+            int tipo = config.getTipo();
+
+            retVal.setCodArt(CodArt);
+            retVal.setPrezzo(prezzo.getPrezzo());
+            retVal.setSconto(sconto);
+            retVal.setTipo(tipo);
+        } else {
+            log.warn("Prezzo Articolo Assente!!");
+            return new ResponseEntity<PrezzoDto>(retVal, HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<PrezzoDto>(retVal, HttpStatus.OK);
     }
 
     // ------------------- DELETE PREZZO LISTINO ------------------------------------
