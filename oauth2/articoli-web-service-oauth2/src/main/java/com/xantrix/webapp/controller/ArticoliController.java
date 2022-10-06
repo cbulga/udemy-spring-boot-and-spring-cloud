@@ -288,7 +288,8 @@ public class ArticoliController {
                 prezzo *= 100;
                 prezzo = Math.round(prezzo);
                 prezzo /= 100;
-            }
+            } else
+                prezzo = prezzoDto.getPrezzo();
 //            ResponseEntity<Double> result = StringUtils.isNotEmpty(idList)
 //                    ? priceClient.getPriceArt(authHeader, codArt, idList)
 //                    : priceClient.getDefPriceArt(authHeader, codArt);

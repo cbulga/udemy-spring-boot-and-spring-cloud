@@ -111,3 +111,23 @@ keycloak:
   realm: Alphashop
   resource: Articoli-Web-Service
   public-client: true
+
+# ==============================================================
+# = Parametri OpenFeign
+# ==============================================================
+feign:
+  # to enable data compression
+  compression:
+    request:
+      enabled: true
+      mime-types:
+        - text/xml,application/xml,application/json
+      min-request-size: 5
+  client:
+    config:
+      PriceArtWebService:
+        connect-timeout: 20000
+        read-timeout: 20000
+      default:
+        connect-timeout: 20000
+        read-timeout: 20000
