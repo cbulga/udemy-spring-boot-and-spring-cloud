@@ -123,11 +123,25 @@ feign:
       mime-types:
         - text/xml,application/xml,application/json
       min-request-size: 5
+    response:
+      enabled: true
+  httpclient:
+    connection-timeout: 3000
   client:
     config:
       PriceArtWebService:
         connect-timeout: 20000
         read-timeout: 20000
       default:
-        connect-timeout: 20000
-        read-timeout: 20000
+        connect-timeout: 300000 # 5 minuti
+        read-timeout: 300000 # 5 minuti
+
+# ==============================================================
+# = Parametri Ribbon
+# ==============================================================
+PriceArtWebService:
+  ribbon:
+    eureka:
+      enabled: false
+    listOfServers: http://localhost:5071,http://localhost:5072,http://localhost:5073
+    ServerListRefreshInterval: 15000
