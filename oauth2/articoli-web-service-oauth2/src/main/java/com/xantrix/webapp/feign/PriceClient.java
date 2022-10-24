@@ -1,7 +1,6 @@
 package com.xantrix.webapp.feign;
 
 import com.xantrix.webapp.dtos.PrezzoDto;
-import org.springframework.cloud.netflix.ribbon.RibbonClient;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,7 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 @FeignClient(name = "PriceArtWebService", configuration = FeignConfiguration.class)
-@RibbonClient(name = "PriceArtWebService")
 public interface PriceClient {
 
     @GetMapping(value = "/api/prezzi/{codart}")

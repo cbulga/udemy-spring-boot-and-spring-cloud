@@ -7,6 +7,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 @SpringBootApplication
 @EnableCaching
+//@EnableEurekaClient
 @EnableDiscoveryClient
 public class Application {
 
