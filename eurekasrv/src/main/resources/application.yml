@@ -36,9 +36,26 @@ eureka:
   # = Impostazione Client
   # ==============================================================
   client:
-    #Un Servizio Eureka è escluso dalla registrazione in Eureka
+    #Un Servizio Eureka ï¿½ escluso dalla registrazione in Eureka
     registerWithEureka: false
     #Non esegue la cache in locale
     fetchRegistry: false
     serviceUrl:
       defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+
+sicurezza:
+  userpwd: ${uspwd}
+  adminpwd: ${adpwd}
+
+jasypt:
+  encryptor:
+    # password passata come variabile da linea di comando al comando mvn di build per produrre un jar con giÃ  valorizzata questa property. Es.: mvn clean install -Denpwd=123_Stella.
+    password: ${enpwd}
+
+# ==============================================================
+# = Logs Parameters
+# ==============================================================
+logging:
+  level:
+    #org.springframework.cloud: DEBUG
+    org.springframework.security: INFO

@@ -132,4 +132,5 @@ eureka:
     registerWithEureka: true
     fetchRegistry: true
     serviceUrl:
-      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+      # BimBumBam_2018: password specified in the eurekasrv => application.yml => sicurezza.userpwd parameter (decoded value is BimBumBam_2018)
+      defaultZone: ${EUREKA_URL:http://user:BimBumBam_2018@localhost:8761/eureka/}
