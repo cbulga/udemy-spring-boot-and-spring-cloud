@@ -1,0 +1,128 @@
+# ==============================================================
+# = API GATEWAY Server Zuul Base
+# ==============================================================
+
+spring:
+  application:
+    name: ZuulServer
+server:
+  port: 8765
+  tomcat:
+    threads: 
+      max: 5
+    
+# ==============================================================
+# = Zuul Parameters
+# ============================================================== 
+zuul:
+  host:
+    connect-timeout-millis: 20000
+    socket-timeout-millis: 60000
+  prefix: /gateway
+  stripPrefix: true
+  ignoredServices: '*'
+# ==============================================================
+# = Route Parameters
+# ==============================================================
+  routes:
+    articoli:
+      path: /getart/** 
+      serviceId: ProductsWebService     
+      sensitive-headers: Cookie,Set-Cookie
+    prezzi: 
+      path: /getprice/**
+      serviceId: PriceArtWebService
+      sensitive-headers: Cookie,Set-Cookie     
+   
+            
+ProductsWebService:
+  ribbon:
+   ReadTimeout: 60000
+   ConnectTimeout: 20000
+   MaxTotalHttpConnections: 500
+   MaxConnectionsPerHost: 100
+PriceArtWebService:
+  ribbon:
+   ReadTimeout: 30000
+   ConnectTimeout: 20000
+
+            
+# ==============================================================
+# = Eureka Properties  
+# = Nota: prima di attivare il servizio servono tre heartbeat
+# ==============================================================
+eureka:
+# ==============================================================
+# = Impostazioni Instance
+# ============================================================== 
+  instance:
+    # intervallo di attesa prima della rimozione del servizio (def 90 sec)
+    lease-expiration-duration-in-seconds: 60
+    # intervallo di invio dell'heartbeat (def 30 sec)
+    leaseRenewalIntervalInSeconds: 15
+    # id di identificazione dell'istanza
+    instanceId: ${server.port}-${spring.application.name}
+    # registrazione per indirizzo ip (defualt hostname)
+    preferIpAddress: true
+# ==============================================================
+# = Impostazioni Client
+# ============================================================== 
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+     defaultZone: ${EUREKA_URL:http://user:BimBumBam_2018@localhost:8761/eureka/}
+    #time out di connessione in secondi al server Eureka (def 5 sec) 
+    eureka-server-connect-timeout-seconds: 8
+    
+# ==============================================================
+# = Actuator Parameters
+# ==============================================================
+management:
+  endpoint:
+    health:
+      show-details: WHEN_AUTHORIZED
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,routes,filters
+        
+# ==============================================================
+# = Actuator Info
+# ==============================================================
+info:
+  assistenza:
+    nome: "Cristian Bulgarelli"
+  nome:
+    nome-app: "Zuul Server - Versione Base" 
+    
+# ==============================================================
+# = Logs Parameters
+# ==============================================================        
+logging:
+  level:
+    org.springframework.cloud: DEBUG
+    org.springframework.security: DEBUG             
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+
+
+      
+  
