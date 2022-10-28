@@ -19,29 +19,31 @@ eureka:
   instance:
     hostname: localhost
     #Specifica se la registrazione avviene tramite ip
-    preferIpAddress: false
+    preferIpAddress: true
   # ==============================================================
   # = Impostazione Server
   # ==============================================================
   server:
-    #Abilita o disabilita l'auto preservazione
+    # Abilita o disabilita l'auto preservazione
     enableSelfPreservation: true
-    #Durata (in ms) della cache
+    # Durata (in ms) della cache
     responseCacheUpdateIntervalMs: 60000
-    #Tempo di attesa in ms di deregistrazione del servizio (def 60000)
+    # Tempo di attesa in ms di deregistrazione del servizio (def 60000)
     evictionIntervalTimerInMs: 30000
-    #Tempo di attesa (in secondi) prima di accettare richieste
+    # Tempo di attesa (in secondi) prima di accettare richieste
     waitTimeInMsWhenSyncEmpty: 5
+    # timeout di connessione al peer
+    peer-node-read-timeout-ms: 500
   # ==============================================================
   # = Impostazione Client
   # ==============================================================
   client:
-    #Un Servizio Eureka � escluso dalla registrazione in Eureka
+    # Un Servizio Eureka è escluso dalla registrazione in Eureka
     registerWithEureka: false
-    #Non esegue la cache in locale
+    # Non esegue la cache in locale
     fetchRegistry: false
     serviceUrl:
-      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+      defaultZone: ${EUREKA_URL:http://user:BimBumBam_2018@localhost:8761/eureka/}
 
 sicurezza:
   userpwd: ${uspwd}
