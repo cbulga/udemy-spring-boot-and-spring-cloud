@@ -149,7 +149,8 @@ eureka:
     # intervallo di invio dell'heartbeat (def 30 sec)
     leaseRenewalIntervalInSeconds: 15
     # id di identificazione dell'istanza
-    instanceId: ${server.port}-${spring.application.name}-${seq}
+#    instanceId: ${server.port}-${spring.application.name}-${seq}
+    instanceId: ${server.port}-${spring.application.name}
     # registrazione per indirizzo ip (defualt hostname)
     preferIpAddress: true
   # ==============================================================
