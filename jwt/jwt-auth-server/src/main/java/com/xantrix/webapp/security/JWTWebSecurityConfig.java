@@ -18,18 +18,19 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class JWTWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    @Qualifier("customUserDetailsService")
-    private UserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
+    private final String authenticationPath;
 
-    @Value("${sicurezza.uri}")
-    private String authenticationPath;
+    public JWTWebSecurityConfig(@Qualifier("customUserDetailsService") UserDetailsService userDetailsService,
+                                @Value("${sicurezza.uri}") String authenticationPath) {
+        this.userDetailsService = userDetailsService;
+        this.authenticationPath = authenticationPath;
+    }
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -37,7 +38,7 @@ public class JWTWebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoderBean() {
+    public static PasswordEncoder passwordEncoderBean() {
         return new BCryptPasswordEncoder();
     }
 
