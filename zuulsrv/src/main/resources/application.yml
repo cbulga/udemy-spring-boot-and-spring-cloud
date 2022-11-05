@@ -120,12 +120,12 @@ sicurezza:
   header: Authorization
   prefix: Bearer
   expiration: 86400
-  secret: 123_Stella
+  secret: $123_Stella@xantrix.it
 
 # ==============================================================
 # = Proprietà Servizio gestUser
 # ==============================================================
 gestuser:
-  password: BimBumBam_2018 # 123Stella
+  password: 123Stella
   srvUrl: http://localhost:8019/api/utenti/cerca/userid/
   userId: Cristian

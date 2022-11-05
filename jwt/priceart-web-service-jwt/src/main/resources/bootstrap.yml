@@ -19,11 +19,19 @@ spring:
       profile: ${profilo}
       # branch git da usare da cui caricare la configurazione del config server
       #label: list3
+      label: ${ramo}
       # username and password to authenticate into the config server
       username: user
       password: BimBumBam_2018
       # if fail-fast is true, the microservice will throw an exception during startup when it does not authenticate successfully in the config server
       fail-fast: true
+      # timeout on waiting to connect to the Config Server
+      request-connect-timeout: 5
+      retry:
+        # Maximum number of attempts of reconnect to the config server
+        max-attempts: 10
+        # Maximum interval for backoff (milliseconds to wait before retry to connect to the config server)
+        max-interval: 1500
   # ==============================================================
   # = Proprietà RabbitMQ
   # ==============================================================
@@ -52,42 +60,102 @@ spring:
             non_contextual_creation: true
         format_sql: true
     show-sql: true
-    
-# ==============================================================
-# = Actuator Parameters
-# ==============================================================
-management:
-  endpoint:
-    health:
-      show-details: WHEN_AUTHORIZED
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics,refresh,bus-refresh
-        
-# ==============================================================
-# = Actuator Info
-# ==============================================================
-info:
-  assistenza:
-    nome: "Cristian Bulgarelli"
-  nome:
-    nome-app: "PriceArt Web Service - Versione Autenticazione JWT"
-# ==============================================================
-# = Proprietà Servizio gestUser
-# ==============================================================           
-gestuser:
-  userId: Cristian
-  password: 123Stella
-  srvUrl: http://localhost:8019/api/utenti/cerca/userid/
+
+# Actuator Parameters e Actuator Info arrivano dal config-server
+## ==============================================================
+## = Actuator Parameters
+## ==============================================================
+#management:
+#  endpoint:
+#    health:
+#      show-details: WHEN_AUTHORIZED
+#  endpoints:
+#    web:
+#      exposure:
+#        include: health,info,metrics,refresh,bus-refresh
+
+## ==============================================================
+## = Actuator Info
+## ==============================================================
+#info:
+#  assistenza:
+#    nome: "Cristian Bulgarelli"
+#  nome:
+#    nome-app: "PriceArt Web Service - Versione Autenticazione JWT"
+## ==============================================================
+## = Proprietà Servizio gestUser
+## ==============================================================
+#gestuser:
+#  userId: Cristian
+#  password: 123Stella
+#  srvUrl: http://localhost:8019/api/utenti/cerca/userid/
   
+## ==============================================================
+## = Parametri Sicurezza JWT
+## ==============================================================
+#sicurezza:
+#    uri: /auth
+#    refresh: /refresh
+#    header: Authorization
+#    prefix: Bearer
+#    expiration: 86400
+#    secret: $123_Stella@xantrix.it
+
 # ==============================================================
-# = Parametri Sicurezza JWT 
+# = Proprietà Livello Log
+# = Default ERROR, WARN e INFO
+# = Levels: TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF
 # ==============================================================
-sicurezza:
-    uri: /auth
-    refresh: /refresh
-    header: Authorization
-    prefix: Bearer 
-    expiration: 86400
-    secret: $123_Stella@xantrix.it
+logging:
+  file:
+    name: "/home/cristian/tmp/Udemy/spring-cloud-course/logs/PriceSrv-${seq}.log"
+  pattern:
+    file: "%d{ dd-MM-yyyy } [%thread] %-5level %logger{36} - %msg%n"
+    #    console: "%d{dd-MM-yyyy HH:mm:ss} - %msg%n"
+    console: "%d{dd.MM.yyyy HH:mm:ss.SSS} %-5p - [%C]:%m%n"
+
+  logback:
+    rollingpolicy:
+      max-file-size: 1MB
+  # Livello del log generale
+  level:
+    root: WARN
+    #    com:
+    #      xantrix:
+    #        DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
+    org.springframework.web: INFO
+    com.xantrix.webapp: DEBUG
+    com.hazelcast: INFO
+
+# ==============================================================
+# = Eureka Properties
+# = Nota: prima di attivare il servizio servono tre heartbeat
+# ==============================================================
+eureka:
+  # ==============================================================
+  # = Impostazioni Instance
+  # ==============================================================
+  instance:
+    # intervallo di attesa prima della rimozione del servizio (def 90 sec)
+    lease-expiration-duration-in-seconds: 60
+    # intervallo di invio dell'heartbeat (def 30 sec)
+    leaseRenewalIntervalInSeconds: 15
+    # id di identificazione dell'istanza
+    #    instanceId: ${server.port}-${spring.application.name}-${seq}
+    instanceId: ${server.port}-${spring.application.name}
+    # registrazione per indirizzo ip (defualt hostname)
+    preferIpAddress: true
+  # ==============================================================
+  # = Impostazioni Client
+  # ==============================================================
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      # BimBumBam_2018: password specified in the eurekasrv => application.yml => sicurezza.userpwd parameter (decoded value is BimBumBam_2018)
+      defaultZone: ${EUREKA_URL:http://user:BimBumBam_2018@localhost:8761/eureka/}
+    # time out di connessione in secondi al server Eureka (def 5 sec)
+    eureka-server-connect-timeout-seconds: 8

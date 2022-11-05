@@ -75,7 +75,7 @@ spring:
 #    web:
 #      exposure:
 #        include: health,info,metrics,refresh,bus-refresh
-#
+
 ## ==============================================================
 ## = Actuator Info
 ## ==============================================================
@@ -101,7 +101,7 @@ keycloak:
 # ==============================================================
 logging:
   file:
-    name: "/home/cristian/tmp/Udemy/spring-cloud-course/logs/ArtSrv.log"
+    name: "/home/cristian/tmp/Udemy/spring-cloud-course/logs/PriceSrv-${seq}.log"
   pattern:
     file: "%d{ dd-MM-yyyy } [%thread] %-5level %logger{36} - %msg%n"
     #    console: "%d{dd-MM-yyyy HH:mm:ss} - %msg%n"

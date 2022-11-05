@@ -3,12 +3,15 @@ package com.xantrix.webapp.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.xantrix.webapp.dtos.ArticoliDto;
+import com.xantrix.webapp.dtos.PrezzoDto;
 import com.xantrix.webapp.entities.Articoli;
 import com.xantrix.webapp.exception.BindingException;
 import com.xantrix.webapp.exception.DuplicateException;
 import com.xantrix.webapp.exception.ErrorResponse;
 import com.xantrix.webapp.exception.NotFoundException;
+import com.xantrix.webapp.feign.PriceClient;
 import com.xantrix.webapp.service.ArticoliService;
+import feign.FeignException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,6 +20,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.HttpHeaders;
@@ -26,9 +30,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/articoli")
@@ -45,14 +51,17 @@ public class ArticoliController {
     public static final String ARTICOLO_PER_DESCRIZIONE_NON_TROVATO = "Non è stato trovato alcun articolo avente descrizione %s";
     public static final String ARTICOLO_DUPLICATO_IMPOSSIBILE_UTILIZZARE_IL_METODO_POST = "Articolo %s presente in anagrafica! Impossibile utilizzare il metodo POST";
     public static final String INSERIMENTO_ARTICOLO_ESEGUITO_CON_SUCCESSO = "Inserimento Articolo %s Eseguito Con Successo";
+    public static final String AUTHORIZATION = "Authorization";
 
     private final ArticoliService articoliService;
 
     private final ResourceBundleMessageSource errMessage;
+    private final PriceClient priceClient;
 
-    public ArticoliController(ArticoliService articoliService, ResourceBundleMessageSource errMessage) {
+    public ArticoliController(ArticoliService articoliService, ResourceBundleMessageSource errMessage, PriceClient priceClient) {
         this.articoliService = articoliService;
         this.errMessage = errMessage;
+        this.priceClient = priceClient;
     }
 
     @Operation(summary = "Ricerca l'articolo per BARCODE", description = "Restituisce i dati dell'articolo in formato JSON",
@@ -64,9 +73,11 @@ public class ArticoliController {
             @ApiResponse(responseCode = "403", description = "Utente Non AUTORIZZATO ad accedere alle informazioni", content = @Content),
             @ApiResponse(responseCode = "404", description = "L'articolo cercato NON è stato trovato!",
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))})
-    @GetMapping(value = "/cerca/ean/{barCode}", produces = "application/json")
+    @GetMapping(value = {"/cerca/ean/{barCode}", "/cerca/ean/{barCode}/{idlist}"}, produces = "application/json")
     // ---------------------- Ricerca per barcode -----------------------------
-    public ResponseEntity<ArticoliDto> listArtByEan(@Parameter(description = "Barcode Articolo", required = true) @PathVariable("barCode") String barCode) throws NotFoundException {
+    public ResponseEntity<ArticoliDto> listArtByEan(@Parameter(description = "Barcode Articolo", required = true) @PathVariable("barCode") String barCode,
+                                                    @PathVariable("idlist") Optional<String> optIdList,
+                                                    HttpServletRequest httpServletRequest) throws NotFoundException {
         log.info("****** Otteniamo l'articolo con barcode {} ******", barCode);
         ArticoliDto articolo = articoliService.selByBarCode(barCode);
 
@@ -74,6 +85,9 @@ public class ArticoliController {
             String errorMessage = String.format(BARCODE_NOT_FOUND, barCode);
             log.warn(errorMessage, barCode);
             throw new NotFoundException(errorMessage);
+        } else {
+            String authHeader = httpServletRequest.getHeader(AUTHORIZATION);
+            articolo.setPrezzo(getPriceArt(authHeader, articolo.getCodArt(), optIdList.orElse(null)));
         }
 
         return new ResponseEntity<>(articolo, HttpStatus.OK);
@@ -86,8 +100,10 @@ public class ArticoliController {
             @ApiResponse(responseCode = "401", description = "Utente non AUTENTICATO", content = @Content),
             @ApiResponse(responseCode = "403", description = "Utente Non AUTORIZZATO ad accedere alle informazioni", content = @Content),
             @ApiResponse(responseCode = "404", description = "L'articolo cercato NON è stato trovato!", content = @Content)})
-    @GetMapping(value = "/cerca/codice/{codArt}", produces = "application/json")
-    public ResponseEntity<ArticoliDto> listArtByCodArt(@Parameter(description = "Codice univoco dell'articolo", required = true) @PathVariable("codArt") String codArt) throws NotFoundException {
+    @GetMapping(value = {"/cerca/codice/{codArt}", "/cerca/codice/{codArt}/{idlist}"}, produces = "application/json")
+    public ResponseEntity<ArticoliDto> listArtByCodArt(@Parameter(description = "Codice univoco dell'articolo", required = true) @PathVariable("codArt") String codArt,
+                                                       @PathVariable("idlist") Optional<String> optIdList,
+                                                       HttpServletRequest httpServletRequest) throws NotFoundException {
         log.info("****** Otteniamo l'articolo con codice {} ******", codArt);
         ArticoliDto articolo = articoliService.selByCodArt(codArt);
 
@@ -95,6 +111,9 @@ public class ArticoliController {
             String errorMessage = String.format(ARTICOLO_NON_TROVATO, codArt);
             log.warn(errorMessage);
             throw new NotFoundException(errorMessage);
+        } else {
+            String authHeader = httpServletRequest.getHeader(AUTHORIZATION);
+            articolo.setPrezzo(getPriceArt(authHeader, codArt, optIdList.orElse(null)));
         }
 
         return new ResponseEntity<>(articolo, HttpStatus.OK);
@@ -107,14 +126,19 @@ public class ArticoliController {
             @ApiResponse(responseCode = "401", description = "Utente non AUTENTICATO", content = @Content),
             @ApiResponse(responseCode = "403", description = "Utente Non AUTORIZZATO ad accedere alle informazioni", content = @Content),
             @ApiResponse(responseCode = "404", description = "L'articolo/i cercato/i NON sono stati trovati!", content = @Content)})
-    @GetMapping(value = "/cerca/descrizione/{descrizione}", produces = "application/json")
-    public ResponseEntity<List<ArticoliDto>> listArtByDescrizione(@Parameter(description = "Descrizione dell'articolo", required = true) @PathVariable("descrizione") String descrizione) throws NotFoundException {
+    @GetMapping(value = {"/cerca/descrizione/{descrizione}", "/cerca/descrizione/{descrizione}/{idlist}"}, produces = "application/json")
+    public ResponseEntity<List<ArticoliDto>> listArtByDescrizione(@Parameter(description = "Descrizione dell'articolo", required = true) @PathVariable("descrizione") String descrizione,
+                                                                  @PathVariable("idlist") Optional<String> optIdList,
+                                                                  HttpServletRequest httpServletRequest) throws NotFoundException {
         log.info("****** Otteniamo gli articoli con descrizione {} ******", descrizione);
         List<ArticoliDto> articoli = articoliService.selByDescrizione(descrizione + "%");
         if (articoli.isEmpty()) {
             String errorMessage = String.format(ARTICOLO_PER_DESCRIZIONE_NON_TROVATO, descrizione);
             log.warn(errorMessage);
             throw new NotFoundException(errorMessage);
+        } else {
+            String authHeader = httpServletRequest.getHeader(AUTHORIZATION);
+            articoli.forEach(a -> a.setPrezzo(getPriceArt(authHeader, a.getCodArt(), optIdList.orElse(null))));
         }
 
         return new ResponseEntity<>(articoli, HttpStatus.OK);
@@ -234,5 +258,36 @@ public class ArticoliController {
         result.put("code", HttpStatus.OK.toString());
         result.put("message", String.format(ELIMINAZIONE_ARTICOLO_ESEGUITA_CON_SUCCESSO, codArt));
         return new ResponseEntity<>(result, headers, HttpStatus.OK);
+    }
+
+    protected double getPriceArt(String authHeader, String codArt, String idList) {
+        double prezzo = 0;
+
+        try {
+            ResponseEntity<PrezzoDto> result = StringUtils.isNotEmpty(idList)
+                    ? priceClient.getPriceArt2(authHeader, codArt, idList)
+                    : priceClient.getDefPriceArt2(authHeader, codArt);
+            PrezzoDto prezzoDto = result.getBody();
+            log.info("Prezzo articolo {}: {}", prezzoDto.getCodArt(), prezzoDto.getPrezzo());
+            if (prezzoDto.getSconto() > 0) {
+                log.info("Attivato sconto: {}%", prezzoDto.getSconto());
+                prezzo = prezzoDto.getPrezzo() * (1 - (prezzoDto.getSconto() / 100));
+                prezzo *= 100;
+                prezzo = Math.round(prezzo);
+                prezzo /= 100;
+            } else
+                prezzo = prezzoDto.getPrezzo();
+//            ResponseEntity<Double> result = StringUtils.isNotEmpty(idList)
+//                    ? priceClient.getPriceArt(authHeader, codArt, idList)
+//                    : priceClient.getDefPriceArt(authHeader, codArt);
+//            if (!result.getStatusCode().equals(HttpStatus.NOT_FOUND))
+//                prezzo = result.getBody();
+//
+//            log.info("Prezzo articolo {}: {}", codArt, prezzo);
+        } catch (FeignException ex) {
+            log.warn("Errore: {}", ex.getLocalizedMessage());
+        }
+
+        return prezzo;
     }
 }

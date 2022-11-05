@@ -119,7 +119,7 @@ public class ArticoliController {
             log.warn(errorMessage);
             throw new NotFoundException(errorMessage);
         } else {
-            String authHeader = httpServletRequest.getHeader("Authorization");
+            String authHeader = httpServletRequest.getHeader(AUTHORIZATION);
             articolo.setPrezzo(getPriceArt(authHeader, codArt, optIdList.orElse(null)));
         }
 
@@ -147,7 +147,7 @@ public class ArticoliController {
             log.warn(errorMessage);
             throw new NotFoundException(errorMessage);
         } else {
-            String authHeader = httpServletRequest.getHeader("Authorization");
+            String authHeader = httpServletRequest.getHeader(AUTHORIZATION);
             articoli.forEach(a -> a.setPrezzo(getPriceArt(authHeader, a.getCodArt(), optIdList.orElse(null))));
         }
 
