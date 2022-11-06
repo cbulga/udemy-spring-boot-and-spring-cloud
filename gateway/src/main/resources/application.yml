@@ -26,10 +26,11 @@ spring:
           uri: lb://ProductsWebService
           predicates:
             - Path=/api/articoli/**
-            #- Query=IdList
-            #- RemoteAddr=127.0.0.1/24
+            #- Query=IdList                                                           # abilita la rotta solo se contiene il parametro IdList come query parameter
+            #- RemoteAddr=127.0.0.1/24                                                # abilita la rotta solo se proveniente dal client sull'ip 127.0.0.1 sulla subnet mask 24, cioè attiva il range di host da 127.0.0.1 a 127.0.0.254
           filters:
-          #- AddRequestParameter=IdList, 1
+          #- AddRequestParameter=IdList, 1                                            # il gateway aggiunge automaticamente alla rotta il query param IdList con valore 1
+          # il gateway aggiunge automaticamente alla rotta l'header Authorization con il relativo valore
           #- AddRequestHeader=Authorization, Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJOaWNvbGEiLCJleHAiOjE2MTY5NDcwMTUsImlhdCI6MTYxNjg2MDYxNSwiYXV0aG9yaXRpZXMiOlsiUk9MRV9VU0VSIl19.u15UqbQrcHjFoRo7mzFbciBVSWVpfYqs2qZsI4MpMJJajIibkMBHdRNQxzmoum3i4IB4W6fiLuksahIVgB2Ckw
         - id: prezziModule
           uri: lb://PriceArtWebService
@@ -39,9 +40,9 @@ spring:
           uri: lb://PriceArtWebService
           predicates:
             - Path=/api/listino/**
-            #- Method=GET,POST
-            #- After=2021-01-01T17:42:47.789-07:00
-            #- Between=2021-03-01T17:42:47.789-07:00, 2021-03-10T17:42:47.789-07:00
+            #- Method=GET,POST                                                        # abilita solo determinati verbi HTTP sulla rotta
+            #- After=2021-01-01T17:42:47.789-07:00                                    # abilita la rotta a partire da una certa data
+            #- Between=2021-03-01T17:42:47.789-07:00, 2021-03-10T17:42:47.789-07:00   # abilita la rotta in un certo range temporale
 
 # ==============================================================
 # = Eureka Properties
