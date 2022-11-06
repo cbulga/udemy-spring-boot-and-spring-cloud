@@ -1,0 +1,80 @@
+# ==============================================================
+# = SPRING API GATEWAY
+# ==============================================================
+server:
+  port: 8765
+  tomcat:
+    threads:
+      max: 5
+
+spring:
+  application:
+    name: SpringApiGateway
+  cloud:
+    gateway:
+      httpclient:
+        #Timeout di connessione in ms
+        connect-timeout: 50000
+        #Timeout di risposta in s
+        response-timeout: 50s
+      enabled: true
+      # ==============================================================
+      # = Route Parameters
+      # ==============================================================
+      routes:
+        - id: articoliModule
+          uri: lb://ProductsWebService
+          predicates:
+            - Path=/api/articoli/**
+            #- Query=IdList
+            #- RemoteAddr=127.0.0.1/24
+          filters:
+          #- AddRequestParameter=IdList, 1
+          #- AddRequestHeader=Authorization, Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJOaWNvbGEiLCJleHAiOjE2MTY5NDcwMTUsImlhdCI6MTYxNjg2MDYxNSwiYXV0aG9yaXRpZXMiOlsiUk9MRV9VU0VSIl19.u15UqbQrcHjFoRo7mzFbciBVSWVpfYqs2qZsI4MpMJJajIibkMBHdRNQxzmoum3i4IB4W6fiLuksahIVgB2Ckw
+        - id: prezziModule
+          uri: lb://PriceArtWebService
+          predicates:
+            - Path=/api/prezzi/**
+        - id: listinoModule
+          uri: lb://PriceArtWebService
+          predicates:
+            - Path=/api/listino/**
+            #- Method=GET,POST
+            #- After=2021-01-01T17:42:47.789-07:00
+            #- Between=2021-03-01T17:42:47.789-07:00, 2021-03-10T17:42:47.789-07:00
+
+# ==============================================================
+# = Eureka Properties
+# = Nota: prima di attivare il servizio servono tre heartbeat
+# ==============================================================
+eureka:
+  # ==============================================================
+  # = Impostazioni Instance
+  # ==============================================================
+  instance:
+    #intervallo di attesa prima della rimozione del servizio (def 90 sec)
+    lease-expiration-duration-in-seconds: 60
+    #intervallo di invio dell'heartbeat (def 30 sec)
+    leaseRenewalIntervalInSeconds: 15
+    #id di identificazione dell'istanza
+    instanceId: ${server.port}-${spring.application.name}
+    #registrazione per indirizzo ip (defualt hostname)
+    preferIpAddress: true
+  # ==============================================================
+  # = Impostazioni Client
+  # ==============================================================
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: ${EUREKA_URL:http://user:BimBumBam_2018@localhost:8761/eureka/}
+    #time out di connessione in secondi al server Eureka (def 5 sec)
+    eureka-server-connect-timeout-seconds: 8
+
+# ==============================================================
+# = Logs Parameters
+# ==============================================================
+logging:
+  level:
+    org.springframework.cloud: DEBUG
+    #org.springframework.security: DEBUG
