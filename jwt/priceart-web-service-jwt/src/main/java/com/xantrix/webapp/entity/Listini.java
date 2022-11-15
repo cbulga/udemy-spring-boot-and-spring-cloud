@@ -32,7 +32,7 @@ public class Listini implements Serializable {
     @Basic
     private String obsoleto;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "listino")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "listino")
     @JsonManagedReference
     private Set<DettListini> dettListini = new HashSet<>();
 

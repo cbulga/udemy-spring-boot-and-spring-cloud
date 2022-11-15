@@ -3,7 +3,6 @@ package com.xantrix.webapp.tests.ControllerTest;
 import com.xantrix.webapp.Application;
 import com.xantrix.webapp.entities.Articoli;
 import com.xantrix.webapp.repository.ArticoliRepository;
-import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -18,8 +17,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.io.IOException;
-
 import static com.xantrix.webapp.controller.ArticoliController.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -29,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = Application.class)
 @SpringBootTest
 @TestMethodOrder(OrderAnnotation.class)
-public class InsertArtTest {
+class InsertArtTest {
 
     @Autowired
     private ArticoliRepository articoliRepository;
@@ -40,13 +37,13 @@ public class InsertArtTest {
     private WebApplicationContext wac;
 
     @BeforeEach
-    public void setup() throws JSONException, IOException {
+    public void setup() {
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .build();
     }
 
-    private String ApiBaseUrl = "/api/articoli";
+    private final String ApiBaseUrl = "/api/articoli";
 
     String JsonData =
             "{\r\n" +
@@ -78,7 +75,7 @@ public class InsertArtTest {
 
     @Test
     @Order(1)
-    public void testInsArticolo() throws Exception {
+    void testInsArticolo() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post(ApiBaseUrl + "/inserisci")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonData)
@@ -97,7 +94,7 @@ public class InsertArtTest {
 
     @Test
     @Order(2)
-    public void testErrInsArticolo2() throws Exception {
+    void testErrInsArticolo2() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post(ApiBaseUrl + "/inserisci")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonData)
@@ -138,7 +135,7 @@ public class InsertArtTest {
 
     @Test
     @Order(3)
-    public void testErrInsArticolo() throws Exception {
+    void testErrInsArticolo() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post(ApiBaseUrl + "/inserisci")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(ErrJsonData)
@@ -179,7 +176,7 @@ public class InsertArtTest {
 
     @Test
     @Order(4)
-    public void testUpdArticolo() throws Exception {
+    void testUpdArticolo() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put(ApiBaseUrl + "/modifica")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonDataMod)
@@ -224,7 +221,7 @@ public class InsertArtTest {
 
     @Test
     @Order(5)
-    public void testErrUpdArticolo() throws Exception {
+    void testErrUpdArticolo() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put(ApiBaseUrl + "/modifica")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(ErrJsonDataMod)
@@ -237,7 +234,7 @@ public class InsertArtTest {
 
     @Test
     @Order(6)
-    public void testDelArticolo() throws Exception {
+    void testDelArticolo() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete(ApiBaseUrl + "/elimina/500123456789")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -248,7 +245,7 @@ public class InsertArtTest {
 
     @Test
     @Order(7)
-    public void testErrDelArticolo() throws Exception {
+    void testErrDelArticolo() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete(ApiBaseUrl + "/elimina/500123456789")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(ErrJsonDataMod)

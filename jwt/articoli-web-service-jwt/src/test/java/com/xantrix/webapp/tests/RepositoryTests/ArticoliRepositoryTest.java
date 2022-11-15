@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest()
 @ContextConfiguration(classes = Application.class)
 @TestMethodOrder(OrderAnnotation.class)
-public class ArticoliRepositoryTest {
+class ArticoliRepositoryTest {
 
     public static final String COD_ART_TEST = "500123456789";
     @Autowired
@@ -31,7 +31,7 @@ public class ArticoliRepositoryTest {
 
     @Test
     @Order(1)
-    public void testInsArticolo() {
+    void testInsArticolo() {
         Articoli articolo = Articoli.builder()
                 .codArt(COD_ART_TEST)
                 .descrizione("Articolo di Test")
@@ -59,14 +59,14 @@ public class ArticoliRepositoryTest {
 
     @Test
     @Order(2)
-    public void testSelByDescrizioneLike() {
+    void testSelByDescrizioneLike() {
         List<Articoli> items = articoliRepository.findByDescrizioneLike("Articolo di Test");
         assertEquals(1, items.size());
     }
 
     @Test
     @Order(3)
-    public void testFindByEan() throws Exception {
+    void testFindByEan() {
         assertThat(articoliRepository.selByEan("12345678"))
                 .extracting(Articoli::getDescrizione)
                 .isEqualTo("Articolo di Test");
@@ -74,8 +74,9 @@ public class ArticoliRepositoryTest {
 
     @Test
     @Order(4)
-    public void testDelArticolo() {
+    void testDelArticolo() {
         Articoli articolo = articoliRepository.findByCodArt(COD_ART_TEST);
         articoliRepository.delete(articolo);
+        assertThat(articoliRepository.findByCodArt(COD_ART_TEST)).isNull();
     }
 }

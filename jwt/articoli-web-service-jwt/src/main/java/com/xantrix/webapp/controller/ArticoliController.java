@@ -3,15 +3,12 @@ package com.xantrix.webapp.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.xantrix.webapp.dtos.ArticoliDto;
-import com.xantrix.webapp.dtos.PrezzoDto;
 import com.xantrix.webapp.entities.Articoli;
 import com.xantrix.webapp.exception.BindingException;
 import com.xantrix.webapp.exception.DuplicateException;
 import com.xantrix.webapp.exception.ErrorResponse;
 import com.xantrix.webapp.exception.NotFoundException;
-import com.xantrix.webapp.feign.PriceClient;
 import com.xantrix.webapp.service.ArticoliService;
-import feign.FeignException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,7 +17,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.HttpHeaders;
@@ -52,16 +48,16 @@ public class ArticoliController {
     public static final String ARTICOLO_DUPLICATO_IMPOSSIBILE_UTILIZZARE_IL_METODO_POST = "Articolo %s presente in anagrafica! Impossibile utilizzare il metodo POST";
     public static final String INSERIMENTO_ARTICOLO_ESEGUITO_CON_SUCCESSO = "Inserimento Articolo %s Eseguito Con Successo";
     public static final String AUTHORIZATION = "Authorization";
+    public static final String MESSAGE = "message";
+    public static final String CODE = "code";
 
     private final ArticoliService articoliService;
 
     private final ResourceBundleMessageSource errMessage;
-    private final PriceClient priceClient;
 
-    public ArticoliController(ArticoliService articoliService, ResourceBundleMessageSource errMessage, PriceClient priceClient) {
+    public ArticoliController(ArticoliService articoliService, ResourceBundleMessageSource errMessage) {
         this.articoliService = articoliService;
         this.errMessage = errMessage;
-        this.priceClient = priceClient;
     }
 
     @Operation(summary = "Ricerca l'articolo per BARCODE", description = "Restituisce i dati dell'articolo in formato JSON",
@@ -79,15 +75,13 @@ public class ArticoliController {
                                                     @PathVariable("idlist") Optional<String> optIdList,
                                                     HttpServletRequest httpServletRequest) throws NotFoundException {
         log.info("****** Otteniamo l'articolo con barcode {} ******", barCode);
-        ArticoliDto articolo = articoliService.selByBarCode(barCode);
+        String authHeader = httpServletRequest.getHeader(AUTHORIZATION);
+        ArticoliDto articolo = articoliService.selByBarCode(barCode, optIdList.orElse(null), authHeader);
 
         if (articolo == null) {
             String errorMessage = String.format(BARCODE_NOT_FOUND, barCode);
             log.warn(errorMessage, barCode);
             throw new NotFoundException(errorMessage);
-        } else {
-            String authHeader = httpServletRequest.getHeader(AUTHORIZATION);
-            articolo.setPrezzo(getPriceArt(authHeader, articolo.getCodArt(), optIdList.orElse(null)));
         }
 
         return new ResponseEntity<>(articolo, HttpStatus.OK);
@@ -105,15 +99,13 @@ public class ArticoliController {
                                                        @PathVariable("idlist") Optional<String> optIdList,
                                                        HttpServletRequest httpServletRequest) throws NotFoundException {
         log.info("****** Otteniamo l'articolo con codice {} ******", codArt);
-        ArticoliDto articolo = articoliService.selByCodArt(codArt);
+        String authHeader = httpServletRequest.getHeader(AUTHORIZATION);
+        ArticoliDto articolo = articoliService.selByCodArt(codArt, optIdList.orElse(null), authHeader);
 
         if (articolo == null) {
             String errorMessage = String.format(ARTICOLO_NON_TROVATO, codArt);
             log.warn(errorMessage);
             throw new NotFoundException(errorMessage);
-        } else {
-            String authHeader = httpServletRequest.getHeader(AUTHORIZATION);
-            articolo.setPrezzo(getPriceArt(authHeader, codArt, optIdList.orElse(null)));
         }
 
         return new ResponseEntity<>(articolo, HttpStatus.OK);
@@ -131,14 +123,12 @@ public class ArticoliController {
                                                                   @PathVariable("idlist") Optional<String> optIdList,
                                                                   HttpServletRequest httpServletRequest) throws NotFoundException {
         log.info("****** Otteniamo gli articoli con descrizione {} ******", descrizione);
-        List<ArticoliDto> articoli = articoliService.selByDescrizione(descrizione + "%");
+        String authHeader = httpServletRequest.getHeader(AUTHORIZATION);
+        List<ArticoliDto> articoli = articoliService.selByDescrizione(descrizione + "%", optIdList.orElse(null), authHeader);
         if (articoli.isEmpty()) {
             String errorMessage = String.format(ARTICOLO_PER_DESCRIZIONE_NON_TROVATO, descrizione);
             log.warn(errorMessage);
             throw new NotFoundException(errorMessage);
-        } else {
-            String authHeader = httpServletRequest.getHeader(AUTHORIZATION);
-            articoli.forEach(a -> a.setPrezzo(getPriceArt(authHeader, a.getCodArt(), optIdList.orElse(null))));
         }
 
         return new ResponseEntity<>(articoli, HttpStatus.OK);
@@ -157,7 +147,7 @@ public class ArticoliController {
                     @ApiResponse(responseCode = "401", description = "Non sei AUTENTICATO")
             })
     @PostMapping(value = "/inserisci", produces = "application/json")
-    public ResponseEntity<?> createArt(@Parameter(description = "JSON che rappresenta l'articolo", required = true) @Valid @RequestBody Articoli articoli, BindingResult bindingResult) throws DuplicateException, BindingException {
+    public ResponseEntity<ObjectNode> createArt(@Parameter(description = "JSON che rappresenta l'articolo", required = true) @Valid @RequestBody Articoli articoli, BindingResult bindingResult) throws DuplicateException, BindingException {
         log.info("****** Salviamo l'articolo con codice {} ******", articoli.getCodArt());
 
         if (bindingResult.hasErrors()) {
@@ -166,7 +156,7 @@ public class ArticoliController {
             throw new BindingException(msgErr);
         }
         log.debug("Verifichiamo la presenza dell'articolo passato");
-        ArticoliDto duplicatedArticoli = articoliService.selByCodArt(articoli.getCodArt());
+        Articoli duplicatedArticoli = articoliService.selByCodArt2(articoli.getCodArt());
         if (duplicatedArticoli != null) {
             String errorMessage = String.format(ARTICOLO_DUPLICATO_IMPOSSIBILE_UTILIZZARE_IL_METODO_POST, articoli.getCodArt());
             log.warn(errorMessage);
@@ -180,8 +170,8 @@ public class ArticoliController {
         articoliService.insArticolo(articoli);
 
         ObjectNode responseNode = mapper.createObjectNode();
-        responseNode.put("code", HttpStatus.OK.toString());
-        responseNode.put("message", String.format(INSERIMENTO_ARTICOLO_ESEGUITO_CON_SUCCESSO, articoli.getCodArt()));
+        responseNode.put(CODE, HttpStatus.OK.toString());
+        responseNode.put(MESSAGE, String.format(INSERIMENTO_ARTICOLO_ESEGUITO_CON_SUCCESSO, articoli.getCodArt()));
 
         return new ResponseEntity<>(responseNode, headers, HttpStatus.CREATED);
     }
@@ -199,7 +189,7 @@ public class ArticoliController {
                     @ApiResponse(responseCode = "401", description = "Non sei AUTENTICATO")
             })
     @PutMapping(value = "/modifica", produces = "application/json")
-    public ResponseEntity<?> updateArt(@Parameter(description = "JSON che rappresenta l'articolo", required = true) @Valid @RequestBody Articoli articoli, BindingResult bindingResult) throws NotFoundException, BindingException {
+    public ResponseEntity<ObjectNode> updateArt(@Parameter(description = "JSON che rappresenta l'articolo", required = true) @Valid @RequestBody Articoli articoli, BindingResult bindingResult) throws NotFoundException, BindingException {
         log.info("****** Modifichiamo l'articolo con codice {} ******", articoli.getCodArt());
 
         if (bindingResult.hasErrors()) {
@@ -208,7 +198,7 @@ public class ArticoliController {
             throw new BindingException(msgErr);
         }
 
-        ArticoliDto articoliToUpdate = articoliService.selByCodArt(articoli.getCodArt());
+        Articoli articoliToUpdate = articoliService.selByCodArt2(articoli.getCodArt());
         if (articoliToUpdate == null) {
             String errorMessage = String.format(ARTICOLO_NON_PRESENTE_IN_ANAGRAFICA_IMPOSSIBILE_UTILIZZARE_IL_METODO_PUT, articoli.getCodArt());
             log.warn(errorMessage);
@@ -222,8 +212,8 @@ public class ArticoliController {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         ObjectNode result = objectMapper.createObjectNode();
-        result.put("code", HttpStatus.OK.toString());
-        result.put("message", String.format(MODIFICA_ARTICOLO_ESEGUITA_CON_SUCCESSO, articoli.getCodArt()));
+        result.put(CODE, HttpStatus.OK.toString());
+        result.put(MESSAGE, String.format(MODIFICA_ARTICOLO_ESEGUITA_CON_SUCCESSO, articoli.getCodArt()));
 
         return new ResponseEntity<>(result, headers, HttpStatus.CREATED);
     }
@@ -239,7 +229,7 @@ public class ArticoliController {
                     @ApiResponse(responseCode = "401", description = "Non sei AUTENTICATO")
             })
     @DeleteMapping(value = "/elimina/{codArt}", produces = "application/json")
-    public ResponseEntity<?> deleteArt(@Parameter(description = "Codice univoco dell'articolo", required = true) @PathVariable("codArt") String codArt) throws NotFoundException {
+    public ResponseEntity<ObjectNode> deleteArt(@Parameter(description = "Codice univoco dell'articolo", required = true) @PathVariable("codArt") String codArt) throws NotFoundException {
         log.info("****** Eliminiamo l'articolo con codice {} ******", codArt);
 
         Articoli articoliToDelete = articoliService.selByCodArt2(codArt);
@@ -255,39 +245,8 @@ public class ArticoliController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         ObjectNode result = objectMapper.createObjectNode();
-        result.put("code", HttpStatus.OK.toString());
-        result.put("message", String.format(ELIMINAZIONE_ARTICOLO_ESEGUITA_CON_SUCCESSO, codArt));
+        result.put(CODE, HttpStatus.OK.toString());
+        result.put(MESSAGE, String.format(ELIMINAZIONE_ARTICOLO_ESEGUITA_CON_SUCCESSO, codArt));
         return new ResponseEntity<>(result, headers, HttpStatus.OK);
-    }
-
-    protected double getPriceArt(String authHeader, String codArt, String idList) {
-        double prezzo = 0;
-
-        try {
-            ResponseEntity<PrezzoDto> result = StringUtils.isNotEmpty(idList)
-                    ? priceClient.getPriceArt2(authHeader, codArt, idList)
-                    : priceClient.getDefPriceArt2(authHeader, codArt);
-            PrezzoDto prezzoDto = result.getBody();
-            log.info("Prezzo articolo {}: {}", prezzoDto.getCodArt(), prezzoDto.getPrezzo());
-            if (prezzoDto.getSconto() > 0) {
-                log.info("Attivato sconto: {}%", prezzoDto.getSconto());
-                prezzo = prezzoDto.getPrezzo() * (1 - (prezzoDto.getSconto() / 100));
-                prezzo *= 100;
-                prezzo = Math.round(prezzo);
-                prezzo /= 100;
-            } else
-                prezzo = prezzoDto.getPrezzo();
-//            ResponseEntity<Double> result = StringUtils.isNotEmpty(idList)
-//                    ? priceClient.getPriceArt(authHeader, codArt, idList)
-//                    : priceClient.getDefPriceArt(authHeader, codArt);
-//            if (!result.getStatusCode().equals(HttpStatus.NOT_FOUND))
-//                prezzo = result.getBody();
-//
-//            log.info("Prezzo articolo {}: {}", codArt, prezzo);
-        } catch (FeignException ex) {
-            log.warn("Errore: {}", ex.getLocalizedMessage());
-        }
-
-        return prezzo;
     }
 }

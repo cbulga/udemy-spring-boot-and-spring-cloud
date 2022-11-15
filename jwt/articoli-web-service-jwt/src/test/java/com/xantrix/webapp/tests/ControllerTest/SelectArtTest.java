@@ -1,7 +1,6 @@
 package com.xantrix.webapp.tests.ControllerTest;
 
 import com.xantrix.webapp.Application;
-import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
@@ -16,8 +15,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.io.IOException;
-
 import static com.xantrix.webapp.controller.ArticoliController.BARCODE_NOT_FOUND;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -26,20 +23,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = Application.class)
 @SpringBootTest
 @TestMethodOrder(OrderAnnotation.class)
-public class SelectArtTest {
+class SelectArtTest {
     private MockMvc mockMvc;
 
     @Autowired
     private WebApplicationContext wac;
 
     @BeforeEach
-    public void setup() throws JSONException, IOException {
+    public void setup() {
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .build();
     }
 
-    private String apiBaseUrl = "/api/articoli";
+    private final String apiBaseUrl = "/api/articoli";
 
     String jsonData =
             "{\n" +
@@ -72,7 +69,7 @@ public class SelectArtTest {
 
     @Test
     @Order(1)
-    public void testListArtByEan() throws Exception {
+    void testListArtByEan() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get(apiBaseUrl + "/cerca/ean/8008490000021")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -117,11 +114,10 @@ public class SelectArtTest {
                 .andDo(print());
     }
 
-    private String barCode = "8008490002138";
-
     @Test
     @Order(2)
-    public void testErrlistArtByEan() throws Exception {
+    void testErrlistArtByEan() throws Exception {
+        String barCode = "8008490002138";
         mockMvc.perform(MockMvcRequestBuilders.get(apiBaseUrl + "/cerca/ean/" + barCode)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonData)
@@ -134,7 +130,7 @@ public class SelectArtTest {
 
     @Test
     @Order(3)
-    public void testListArtByCodArt() throws Exception {
+    void testListArtByCodArt() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get(apiBaseUrl + "/cerca/codice/002000301")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -143,11 +139,10 @@ public class SelectArtTest {
                 .andReturn();
     }
 
-    private String codArt = "002000301b";
-
     @Test
     @Order(4)
-    public void testErrlistArtByCodArt() throws Exception {
+    void testErrlistArtByCodArt() throws Exception {
+        String codArt = "002000301b";
         mockMvc.perform(MockMvcRequestBuilders.get(apiBaseUrl + "/cerca/codice/" + codArt)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonData)
@@ -158,11 +153,11 @@ public class SelectArtTest {
                 .andDo(print());
     }
 
-    private String JsonData2 = "[" + jsonData + "]";
+    private final String JsonData2 = "[" + jsonData + "]";
 
     @Test
     @Order(5)
-    public void testListArtByDesc() throws Exception {
+    void testListArtByDesc() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get(apiBaseUrl + "/cerca/descrizione/ACQUA ULIVETO 15 LT")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -174,7 +169,7 @@ public class SelectArtTest {
 
     @Test
     @Order(6)
-    public void testErrlistArtByDesc() throws Exception {
+    void testErrlistArtByDesc() throws Exception {
         String Filter = "5001234848";
 
         mockMvc.perform(MockMvcRequestBuilders.get(apiBaseUrl + "/cerca/descrizione/" + Filter)

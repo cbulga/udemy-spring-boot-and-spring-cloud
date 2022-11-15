@@ -8,15 +8,15 @@ import java.util.List;
 
 public interface ArticoliService {
 
-    List<ArticoliDto> selByDescrizione(String descrizione);
+    List<ArticoliDto> selByDescrizione(String descrizione, String idList, String authHeader);
 
-    List<ArticoliDto> selByDescrizione(String descrizione, Pageable pageable);
+    List<ArticoliDto> selByDescrizione(String descrizione, String idList, String authHeader, Pageable pageable);
 
-    ArticoliDto selByCodArt(String codArt);
+    ArticoliDto selByCodArt(String codArt, String idList, String authHeader);
 
     Articoli selByCodArt2(String codart);
 
-    ArticoliDto selByBarCode(String barcode);
+    ArticoliDto selByBarCode(String barcode, String idList, String authHeader);
 
     void delArticolo(Articoli articolo);
 
