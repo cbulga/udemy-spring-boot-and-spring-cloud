@@ -22,12 +22,18 @@ public class GatewayConfig {
                 .route("articoliModule", r -> r
                         .path("/api/articoli/**")
                         //.and().method("GET")
-                        .filters(f -> f.filter(jwtAuthFilter))
+                        .filters(f -> f.circuitBreaker(config -> config
+                                        .setName("articoliCircuitBreaker")
+                                        .setFallbackUri("forward:/articolo-fallback"))
+                                .filter(jwtAuthFilter))
                         .uri("lb://ProductsWebService"))
                 .route("prezziModule", r -> r
                         .path("/api/prezzi/**")
                         //.and().method("GET,POST,DELETE")
-                        .filters(f -> f.filter(jwtAuthFilter))
+                        .filters(f -> f.circuitBreaker(config -> config
+                                        .setName("prezziCircuitBreaker")
+                                        .setFallbackUri("forward:/prezzo-fallback"))
+                                .filter(jwtAuthFilter))
                         .uri("lb://PriceArtWebService"))
                 .route("listinoModule", r -> r
                         .path("/api/listino/**")

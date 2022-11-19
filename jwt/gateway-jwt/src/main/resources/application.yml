@@ -6,21 +6,68 @@ server:
   tomcat:
     threads:
       max: 5
+  netty:
+    connection-timeout: 2s
+    idle-timeout: 15s
+  shutdown: graceful
 
 spring:
   main:
     allow-bean-definition-overriding: true
   application:
     name: SpringApiGateway
+  lifecycle:
+    timeout-per-shutdown-phase: 15s
   
   cloud:
     gateway:
       httpclient:
         #Timeout di connessione in ms
-        connect-timeout: 50000
+        connect-timeout: 2000 #2s
         #Timeout di risposta in s
-        response-timeout: 50s
+        response-timeout: 5s
+        pool:
+          type: elastic
+          max-idle-time: 15s
+          max-life-time: 60s
+      default-filters:
+        - name: Retry
+          args:
+            retries: 3
+            methods: GET
+            series: SERVER_ERROR
+            exceptions: java.io.IOException, java.util.concurrent.TimeoutException
+            backoff:
+              firstBackoff: 50ms
+              maxBackOff: 500ms
+              factor: 2
+              basedOnPreviousValue: false
       enabled: true
+
+# ==============================================================
+# = Resilience4j Parameters
+# ==============================================================
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        #soglia in percentuali di fallimenti che che determina l'apeWrtura del circuito
+        failureRateThreshold: 50
+        #numero di chiamate di riferimento
+        slidingWindowSize: 5
+        #tempo di durata dello stato di circuito aperto
+        wait-duration-in-open-state: 20000
+        #numero di chiamate in stato half open
+        permittedNumberOfCallsInHalfOpenState: 5
+        #Se impiega più di un secondo viene conteggiato come lento
+        slow-call-duration-threshold: 1000
+        slow-call-rate-threshold: 50.00
+
+  timelimiter:
+    configs:
+      default:
+        timeoutDuration: 3s
+
 # ==============================================================
 # = Eureka Properties  
 # = Nota: prima di attivare il servizio servono tre heartbeat
@@ -59,6 +106,9 @@ logging:
       springframework:
         security: DEBUG
         cloud: DEBUG
+    io:
+      github:
+        resilience4j: DEBUG
     #org.springframework.security: DEBUG 
 
 # ==============================================================
