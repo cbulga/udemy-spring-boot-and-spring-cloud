@@ -31,6 +31,22 @@ spring:
           max-idle-time: 15s
           max-life-time: 60s
       default-filters:
+        - name: RequestRateLimiter
+          args:
+            # filtro redis serve per limitare il numero di chiamate accettate per utente al secondo (per evitare attacchi DDoS)
+            #Numero di token inseriti nel bucket al secondo (se in 1 secondo vengono inseriti più di 10 token nel bucket di redis, quindi abbiamo più di 10 chiamate al secondo, allora redis interverrà...)
+            # It's how many requests per second do you want a user to be allowed to do, without any dropped requests.
+            # This is the rate that the token bucket is filled.
+            redis-rate-limiter.replenishRate: 10
+            #Picco di token per utente inseriti nel bucket in un secondo
+            # Es.: se un utente raggiunge al secondo 0 le 20 richieste massime consentite, ed ogni secondo ne recupera 10, dovrà attendere fino al secondo 3 per poter fare nuove chiamate....
+            # It's the maximum number of requests a user is allowed to do in a single second.
+            # This is the number of tokens the token bucket can hold.
+            # Setting this value to zero will block all requests.
+            redis-rate-limiter.burstCapacity: 10
+            #Numero di token per ciascuna chiamata (ogni chiamata inserisce 1 token nel bucket del redis)
+            redis-rate-limiter.requestedTokens: 1
+            #key-resolver: '#{@userKeyResolver}'
         - name: Retry
           args:
             retries: 3
@@ -43,6 +59,46 @@ spring:
               factor: 2
               basedOnPreviousValue: false
       enabled: true
+
+      # ==============================================================
+      # = Route Parameters
+      # ==============================================================
+      routes:
+        - id: articoliModule
+          uri: lb://ProductsWebService
+          predicates:
+            - Path=/api/articoli/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: articoliCircuitBreaker
+                fallbackUri: forward:/articolo-fallback
+        - id: prezziModule
+          uri: lb://PriceArtWebService
+          predicates:
+            - Path=/api/prezzi/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: prezziCircuitBreaker
+                fallbackUri: forward:/prezzo-fallback
+        - id: listinoModule
+          uri: lb://PriceArtWebService
+          predicates:
+            - Path=/api/listino/**
+        - id: authModule
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/auth/**
+
+  # ==============================================================
+  # = Redis Parameters
+  # ==============================================================
+  redis:
+    connect-timeout: 2s
+    host: localhost
+    port: 6379
+    timeout: 1s
 
 # ==============================================================
 # = Resilience4j Parameters
