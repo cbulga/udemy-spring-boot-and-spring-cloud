@@ -27,8 +27,8 @@ public class PrezziServiceImpl implements PrezziService {
     public static final String FAILURE_TIMOUT_IN_MS = "6000"; //Timeout in ms prima di failure e fallback logic (def 1000)
     public static final String REQUEST_VOLUME_THRESHOLD = "10"; //Numero Minimo di richieste prima di aprire il circuito (Def 20)
     public static final String ERROR_THRESHOLD_PERCENTAGE = "30"; //Percentuale minima di fallimenti prima di apertura del circuito (Def 50)
-    public static final String SLEEP_TIME_IN_MS = "5000"; //Tempo in ms prima di ripetere tentativo di chiusura del circuito (def 5000)
-    public static final String TIME_METRIC_IN_MS = "5000"; //Tempo base in ms delle metriche statistiche
+    public static final String SLEEP_TIME_IN_MS = "5000"; //Tempo in ms prima di ripetere tentativo di chiusura del circuito (def 5000) (cioè quanto tempo il circuito resta aperto prima di essere richiuso)
+    public static final String TIME_METRIC_IN_MS = "5000"; //Tempo base in ms delle metriche statistiche (se in 5 secondi ho almeno il 30% (ERROR_THRESHOLD_PERCENTAGE) di richieste in fallimento o 10 (REQUEST_VOLUME_THRESHOLD) richieste fallite, allora il circuito viene aperto)
 
     public PrezziServiceImpl(PrezziRepository prezziRepository, CacheManager cacheManager) {
         this.prezziRepository = prezziRepository;
