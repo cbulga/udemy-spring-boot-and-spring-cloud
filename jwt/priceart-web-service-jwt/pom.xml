@@ -26,7 +26,7 @@
 <!--        <spring-cloud.version>2021.0.0</spring-cloud.version> NON FUNZIONA! DA' UNA DIPENDENZA CIRCOLARE SU JWTWebSecurityConfig.java -->
         <spring-cloud.version>2020.0.1</spring-cloud.version>
         <spring-cloud-starter-netflix-eureka-client.version>3.1.4</spring-cloud-starter-netflix-eureka-client.version>
-        <spring-cloud-starter-netflix-hystrix.version>2.2.10.RELEASE</spring-cloud-starter-netflix-hystrix.version>
+<!--        <spring-cloud-starter-netflix-hystrix.version>2.2.10.RELEASE</spring-cloud-starter-netflix-hystrix.version>-->
     </properties>
 
     <dependencies>
@@ -37,12 +37,12 @@
             <version>${spring-cloud-starter-netflix-eureka-client.version}</version>
         </dependency>
 
-        <!-- Hystrix -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
-            <version>${spring-cloud-starter-netflix-hystrix.version}</version>
-        </dependency>
+<!--        &lt;!&ndash; Hystrix &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>-->
+<!--            <version>${spring-cloud-starter-netflix-hystrix.version}</version>-->
+<!--        </dependency>-->
 
         <!-- Spring Cloud Config -->
         <dependency>
