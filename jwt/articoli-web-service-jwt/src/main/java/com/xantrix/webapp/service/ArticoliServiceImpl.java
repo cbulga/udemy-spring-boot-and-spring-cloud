@@ -1,5 +1,7 @@
 package com.xantrix.webapp.service;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import com.xantrix.webapp.Resilience4JConfiguration;
 import com.xantrix.webapp.dtos.ArticoliDto;
 import com.xantrix.webapp.dtos.PrezzoDto;
@@ -39,6 +41,14 @@ public class ArticoliServiceImpl implements ArticoliService {
     private final CircuitBreakerFactory<?, ?> circuitBreakerFactory;
     private final PriceClient priceClient;
 
+    //HISTRIX CONSTANT SETTINGS
+    // altre opzioni https://github.com/Netflix/Hystrix/wiki/Configuration
+    public static final String FAILURE_TIMOUT_IN_MS = "6000"; //Timeout in ms prima di failure e fallback logic (def 1000)
+    public static final String REQUEST_VOLUME_THRESHOLD = "10"; //Numero Minimo di richieste prima di aprire il circuito (Def 20)
+    public static final String ERROR_THRESHOLD_PERCENTAGE = "30"; //Percentuale minima di fallimenti prima di apertura del circuito (Def 50)
+    public static final String SLEEP_TIME_IN_MS = "5000"; //Tempo in ms prima di ripetere tentativo di chiusura del circuito (def 5000) (cioè quanto tempo il circuito resta aperto prima di essere richiuso)
+    public static final String TIME_METRIC_IN_MS = "5000"; //Tempo base in ms delle metriche statistiche (se in 5 secondi ho almeno il 30% (ERROR_THRESHOLD_PERCENTAGE) di richieste in fallimento o 10 (REQUEST_VOLUME_THRESHOLD) richieste fallite, allora il circuito viene aperto)
+
     public ArticoliServiceImpl(ArticoliRepository articoliRepository, ModelMapper modelMapper, CacheManager cacheManager, CircuitBreakerFactory<?, ?> circuitBreakerFactory, PriceClient priceClient) {
         this.articoliRepository = articoliRepository;
         this.modelMapper = modelMapper;
@@ -49,6 +59,14 @@ public class ArticoliServiceImpl implements ArticoliService {
 
     @Override
     @Cacheable
+    @HystrixCommand(fallbackMethod = "selByDescrizioneFallBack",
+            commandProperties = {
+                    @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = FAILURE_TIMOUT_IN_MS),
+                    @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = REQUEST_VOLUME_THRESHOLD),
+                    @HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = ERROR_THRESHOLD_PERCENTAGE),
+                    @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = SLEEP_TIME_IN_MS),
+                    @HystrixProperty(name = "metrics.rollingStats.timeInMilliseconds", value = TIME_METRIC_IN_MS)
+            })
     public List<ArticoliDto> selByDescrizione(String descrizione, String idList, String authHeader) {
         List<Articoli> articolis = articoliRepository.findByDescrizioneLike("%" + descrizione.toUpperCase() + "%");
         List<ArticoliDto> articoliDto = !CollectionUtils.isEmpty(articolis) ? articolis.stream()
@@ -59,8 +77,23 @@ public class ArticoliServiceImpl implements ArticoliService {
         return articoliDto;
     }
 
+    @SuppressWarnings("unused")
+    public List<ArticoliDto> selByDescrizioneFallBack(String descrizione, String idList, String authHeader) {
+        log.warn("****** selByDescrizioneFallBack in esecuzione *******");
+        //TODO: prevedere la lettura da fonte dati alternativa
+        return Collections.emptyList();
+    }
+
     @Override
     @Cacheable
+    @HystrixCommand(fallbackMethod = "selByDescrizioneFallBack",
+            commandProperties = {
+                    @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = FAILURE_TIMOUT_IN_MS),
+                    @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = REQUEST_VOLUME_THRESHOLD),
+                    @HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = ERROR_THRESHOLD_PERCENTAGE),
+                    @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = SLEEP_TIME_IN_MS),
+                    @HystrixProperty(name = "metrics.rollingStats.timeInMilliseconds", value = TIME_METRIC_IN_MS)
+            })
     public List<ArticoliDto> selByDescrizione(String descrizione, String idList, String authHeader, Pageable pageable) {
         List<Articoli> articolis = articoliRepository.findByDescrizioneLike("%" + descrizione.toUpperCase() + "%", pageable);
         List<ArticoliDto> articoliDto = !CollectionUtils.isEmpty(articolis) ? articolis.stream()
@@ -71,8 +104,23 @@ public class ArticoliServiceImpl implements ArticoliService {
         return articoliDto;
     }
 
+    @SuppressWarnings("unused")
+    public List<ArticoliDto> selByDescrizioneFallBack(String descrizione, String idList, String authHeader, Pageable pageable) {
+        log.warn("****** selByDescrizioneFallBack in esecuzione *******");
+        //TODO: prevedere la lettura da fonte dati alternativa
+        return Collections.emptyList();
+    }
+
     @Override
     @Cacheable(value = "articolo", key = "#codArt", sync = true)
+    @HystrixCommand(fallbackMethod = "selByCodArtFallBack",
+            commandProperties = {
+                    @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = FAILURE_TIMOUT_IN_MS),
+                    @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = REQUEST_VOLUME_THRESHOLD),
+                    @HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = ERROR_THRESHOLD_PERCENTAGE),
+                    @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = SLEEP_TIME_IN_MS),
+                    @HystrixProperty(name = "metrics.rollingStats.timeInMilliseconds", value = TIME_METRIC_IN_MS)
+            })
     public ArticoliDto selByCodArt(String codArt, String idList, String authHeader) {
         Articoli articoli = selByCodArt2(codArt);
         ArticoliDto articoliDto;
@@ -83,6 +131,13 @@ public class ArticoliServiceImpl implements ArticoliService {
         return articoliDto;
     }
 
+    @SuppressWarnings("unused")
+    public ArticoliDto setByCodArtFallBack(String codArt, String idList, String authHeader) {
+        log.warn("****** setByCodArtFallBack in esecuzione *******");
+        //TODO: prevedere la lettura da fonte dati alternativa
+        return null;
+    }
+
     @Override
     public Articoli selByCodArt2(String codart) {
         return articoliRepository.findByCodArt(codart);
@@ -90,12 +145,27 @@ public class ArticoliServiceImpl implements ArticoliService {
 
     @Override
     @Cacheable(value = "barcode", key = "#barcode", sync = true)
+    @HystrixCommand(fallbackMethod = "selByBarCodeFallBack",
+            commandProperties = {
+                    @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = FAILURE_TIMOUT_IN_MS),
+                    @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = REQUEST_VOLUME_THRESHOLD),
+                    @HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = ERROR_THRESHOLD_PERCENTAGE),
+                    @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = SLEEP_TIME_IN_MS),
+                    @HystrixProperty(name = "metrics.rollingStats.timeInMilliseconds", value = TIME_METRIC_IN_MS)
+            })
     public ArticoliDto selByBarCode(String barcode, String idList, String authHeader) {
         Articoli articoli = articoliRepository.selByEan(barcode);
         ArticoliDto articoliDto = articoli != null ? modelMapper.map(articoli, ArticoliDto.class) : null;
         if (articoliDto != null)
             articoliDto.setPrezzo(getPriceArt(articoliDto.getCodArt(), idList, authHeader));
         return articoliDto;
+    }
+
+    @SuppressWarnings("unused")
+    public ArticoliDto selByBarCodeFallBack(String barcode, String idList, String authHeader) {
+        log.warn("****** selByBarCodeFallBack in esecuzione *******");
+        //TODO: prevedere la lettura da fonte dati alternativa
+        return null;
     }
 
     @Override

@@ -22,7 +22,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,hystrix.stream
 
 #endpoint: http://localhost:8888/{application-name}/{profile}[/{label}]
 
