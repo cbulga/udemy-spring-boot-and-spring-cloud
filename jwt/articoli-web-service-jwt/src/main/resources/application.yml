@@ -39,6 +39,28 @@ spring:
     show-sql: true
 
 # ==============================================================
+# = Zipkin Parameters
+# ==============================================================
+  zipkin:
+    base-url: http://localhost:9411/
+    sender:
+      # invio eventi sincrono
+      type: web
+      # invio eventi asincrono
+#      type: rabbit
+    message-timeout: 5
+
+# ==============================================================
+# = Sleuth Parameters
+# ==============================================================
+  sleuth:
+    sampler:
+      # probability: varia da 1.0 a 0.0. 1.0: qualsiasi evento inserito nei log sarà anche inviato allo sleuth (ed inviato allo zipkin); 0.0 non invia nulla
+      probability: 1.0
+    # se true, genera un identificativo univoco per ogni richiesta di 128 bit; se falso ne genera uno da 64 bit
+    trace-id128: false
+
+# ==============================================================
 # = Actuator Parameters
 # ==============================================================
 management:
@@ -86,7 +108,10 @@ logging:
 #    com:
 #      xantrix:
 #        DEBUG
-    org.springframework.security: DEBUG
+    org:
+      springframework:
+        security: DEBUG
+        cloud: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql: TRACE
     org.springframework.web: INFO
