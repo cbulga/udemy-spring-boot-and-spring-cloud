@@ -20,7 +20,7 @@
 		<spring-cloud.version>2021.0.5</spring-cloud.version>
 		<spring-cloud-starter-sleuth.version>3.1.5</spring-cloud-starter-sleuth.version>
 		<spring-cloud-sleuth-zipkin.version>3.1.5</spring-cloud-sleuth-zipkin.version>
-		<caffeine.version>3.1.1</caffeine.version>
+		<spring-boot-starter-data-redis.version>2.7.5</spring-boot-starter-data-redis.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -106,10 +106,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-cache</artifactId>
 		</dependency>
+		<!-- Redis -->
 		<dependency>
-			<groupId>com.github.ben-manes.caffeine</groupId>
-			<artifactId>caffeine</artifactId>
-			<version>${caffeine.version}</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+			<version>${spring-boot-starter-data-redis.version}</version>
 		</dependency>
 
 		<!-- modelmapper -->

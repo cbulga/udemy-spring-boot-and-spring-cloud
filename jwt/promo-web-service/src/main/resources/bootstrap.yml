@@ -72,7 +72,15 @@ spring:
           lob:
             non_contextual_creation: true
     show-sql: true
-
+  # ==============================================================
+  # = Redis Parameters
+  # ==============================================================
+  redis:
+    connect-timeout: 2s
+    host: localhost
+    #password: password
+    port: 6379
+    timeout: 1s
   # ==============================================================
   # = Zipkin Parameters
   # ==============================================================
