@@ -81,7 +81,7 @@ info:
   assistenza:
     nome: "Cristian Bulgarelli"
     mail: "cristian.bulgarelli@gmail.com"
-    telefono: "3489227531"
+    telefono: "3481234567"
     orario: "9-18"
   nome:
     nome-app: "Articoli Web Service - Versione Autenticazione JWT"
@@ -95,7 +95,7 @@ logging:
   file:
     name: "/home/cristian/tmp/Udemy/spring-cloud-course/logs/ArtSrv.log"
   pattern:
-    file: "%d{ dd-MM-yyyy } [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{ dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
 #    console: "%d{dd-MM-yyyy HH:mm:ss} - %msg%n"
     console: "%d{dd.MM.yyyy HH:mm:ss.SSS} %-5p - [%C]:%m%n"
 

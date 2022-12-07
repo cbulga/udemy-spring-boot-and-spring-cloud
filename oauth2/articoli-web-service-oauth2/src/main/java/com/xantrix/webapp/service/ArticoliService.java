@@ -1,7 +1,7 @@
 package com.xantrix.webapp.service;
 
 import com.xantrix.webapp.dtos.ArticoliDto;
-import com.xantrix.webapp.entities.Articoli;
+import com.xantrix.webapp.entity.Articoli;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;

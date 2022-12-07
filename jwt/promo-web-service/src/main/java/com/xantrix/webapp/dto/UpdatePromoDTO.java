@@ -1,0 +1,56 @@
+package com.xantrix.webapp.dto;
+
+import lombok.*;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Class similar to the {@link CreatePromoDTO} and {@link UpdatePromoDTO}.<p>
+ * Differences between {@link PromoDTO}, {@link CreatePromoDTO}, {@link UpdatePromoDTO}:<ul>
+ * <li>{@link PromoDTO}: <ul>
+ * <li>has a required {@link PromoDTO#getIdPromo() getIdPromo()} property</li>
+ * <li>has a {@link PromoDTO#getDettPromos() getDettPromos()} of type {@link DettPromoDTO} property</li>
+ * </ul></li>
+ * <li>{@link CreatePromoDTO}: <ul>
+ * <li>has a not required {@link CreatePromoDTO#getIdPromo() getIdPromo()} property</li>
+ * <li>has a {@link CreatePromoDTO#getDettPromos() getDettPromos()} of type {@link CreateOrUpdateDettPromoDTO} property</li>
+ * </ul></li>
+ * <li>{@link UpdatePromoDTO}: <ul>
+ * <li>has a required {@link UpdatePromoDTO#getIdPromo() getIdPromo()} property</li>
+ * <li>has a {@link UpdatePromoDTO#getDettPromos() getDettPromos()} of type {@link CreateOrUpdateDettPromoDTO} property</li>
+ * </ul></li>
+ * </ul>
+ */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+public class UpdatePromoDTO implements IPromoDTO, Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 2103397620448059483L;
+    @NotNull(message = "{NotNull.Promo.idPromo.Validation}")
+    @EqualsAndHashCode.Include
+    private String idPromo;
+    @NotNull(message = "{NotNull.Promo.anno.Validation}")
+    private Integer anno;
+    @NotNull(message = "{NotNull.Promo.codice.Validation}")
+    @Size(message = "{Size.Promo.codice.Validation}", min = 3, max = 10)
+    private String codice;
+    @NotEmpty(message = "{NotNull.Promo.descrizione.Validation}")
+    private String descrizione;
+    @Builder.Default
+    @Valid
+    private List<CreateOrUpdateDettPromoDTO> dettPromos = new ArrayList<>();
+    @Builder.Default
+    @Valid
+    private List<DepRifPromoDTO> depRifPromos = new ArrayList<>();
+}

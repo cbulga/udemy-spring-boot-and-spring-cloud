@@ -2,8 +2,8 @@ package com.xantrix.webapp;
 
 import com.xantrix.webapp.dtos.ArticoliDto;
 import com.xantrix.webapp.dtos.BarcodeDto;
-import com.xantrix.webapp.entities.Articoli;
-import com.xantrix.webapp.entities.Barcode;
+import com.xantrix.webapp.entity.Articoli;
+import com.xantrix.webapp.entity.Barcode;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;

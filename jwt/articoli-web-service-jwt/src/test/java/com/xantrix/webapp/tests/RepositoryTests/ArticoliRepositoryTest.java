@@ -1,9 +1,9 @@
 package com.xantrix.webapp.tests.RepositoryTests;
 
 import com.xantrix.webapp.Application;
-import com.xantrix.webapp.entities.Articoli;
-import com.xantrix.webapp.entities.Barcode;
-import com.xantrix.webapp.entities.FamAssort;
+import com.xantrix.webapp.entity.Articoli;
+import com.xantrix.webapp.entity.Barcode;
+import com.xantrix.webapp.entity.FamAssort;
 import com.xantrix.webapp.repository.ArticoliRepository;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;

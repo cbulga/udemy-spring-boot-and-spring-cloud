@@ -1,8 +1,8 @@
 package com.xantrix.webapp.service;
 
 import com.xantrix.webapp.dtos.ArticoliDto;
-import com.xantrix.webapp.entities.Articoli;
-import com.xantrix.webapp.entities.Barcode;
+import com.xantrix.webapp.entity.Articoli;
+import com.xantrix.webapp.entity.Barcode;
 import com.xantrix.webapp.repository.ArticoliRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;

@@ -1,7 +1,7 @@
 package com.xantrix.webapp.tests.ControllerTest;
 
 import com.xantrix.webapp.Application;
-import com.xantrix.webapp.entities.Articoli;
+import com.xantrix.webapp.entity.Articoli;
 import com.xantrix.webapp.repository.ArticoliRepository;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;

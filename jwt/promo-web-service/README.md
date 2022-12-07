@@ -1,0 +1,1 @@
+# Promo Web Service - No secured version (the security is entirely managed by the gateway-jwt service)

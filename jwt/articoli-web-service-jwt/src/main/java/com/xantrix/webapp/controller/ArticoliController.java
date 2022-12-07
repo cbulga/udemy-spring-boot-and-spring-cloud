@@ -3,7 +3,7 @@ package com.xantrix.webapp.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.xantrix.webapp.dtos.ArticoliDto;
-import com.xantrix.webapp.entities.Articoli;
+import com.xantrix.webapp.entity.Articoli;
 import com.xantrix.webapp.exception.BindingException;
 import com.xantrix.webapp.exception.DuplicateException;
 import com.xantrix.webapp.exception.ErrorResponse;

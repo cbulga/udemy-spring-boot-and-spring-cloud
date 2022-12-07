@@ -29,13 +29,23 @@ public class JwtAuthenticationFilter implements GlobalFilter {
             "/api/prezzi/elimina",
             "/api/listino/inserisci",
             "/api/listino/elimina",
-            "/actuator/gateway/**");
+            "/actuator/gateway/**",
+            "/api/promo/elimina",
+            "/api/promo/inserisci",
+            "/api/promo/aggiorna",
+            "/api/promo/clearAllCaches");
     private static final List<String> USER_ENDPOINTS = List.of("/api/articoli/cerca/ean",
             "/api/articoli/cerca/codice",
             "/api/articoli/cerca/descrizione",
             "/api/prezzi",
             "/api/prezzi/info",
-            "/api/listino/cerca/id");
+            "/api/listino/cerca/id",
+            "/api/promo/prezzo/**",
+            "/api/promo/id/**",
+            "/api/promo/codice",
+            "/api/promo/**",
+            "/api/promo",
+            "/api/promo/active");
     private static final Predicate<ServerHttpRequest> IS_ADMIN_ENDPOINT = r -> ADMIN_ENDPOINTS.stream()
             .noneMatch(uri -> r.getURI().getPath().contains(uri));
     private static final Predicate<ServerHttpRequest> IS_USER_ENDPOINT = r -> USER_ENDPOINTS.stream()
