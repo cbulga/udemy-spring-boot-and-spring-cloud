@@ -1,6 +1,6 @@
 package com.xantrix.webapp.feign;
 
-import com.xantrix.webapp.dtos.PrezzoDto;
+import com.xantrix.webapp.dtos.PrezzoDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,9 +18,9 @@ public interface PriceClient {
                           @PathVariable("idlist") String idList);
 
     @GetMapping(value = "/api/prezzi/info/{codart}")
-    ResponseEntity<PrezzoDto> getDefPriceArt2(@RequestHeader("Authorization") String authHeader, @PathVariable("codart") String codArt);
+    ResponseEntity<PrezzoDTO> getDefPriceArt2(@RequestHeader("Authorization") String authHeader, @PathVariable("codart") String codArt);
 
     @GetMapping(value = "/api/prezzi/info/{codart}/{idlist}")
-    ResponseEntity<PrezzoDto> getPriceArt2(@RequestHeader("Authorization") String authHeader, @PathVariable("codart") String codArt,
+    ResponseEntity<PrezzoDTO> getPriceArt2(@RequestHeader("Authorization") String authHeader, @PathVariable("codart") String codArt,
                                            @PathVariable("idlist") String idList);
 }

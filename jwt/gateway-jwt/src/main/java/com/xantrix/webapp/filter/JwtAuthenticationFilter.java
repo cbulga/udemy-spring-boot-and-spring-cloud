@@ -26,6 +26,7 @@ public class JwtAuthenticationFilter implements GlobalFilter {
             "/api/articoli/inserisci",
             "/api/articoli/modifica",
             "/api/articoli/elimina",
+            "/api/articoli-cache/clearAllCaches",
             "/api/prezzi/elimina",
             "/api/listino/inserisci",
             "/api/listino/elimina",
@@ -33,7 +34,8 @@ public class JwtAuthenticationFilter implements GlobalFilter {
             "/api/promo/elimina",
             "/api/promo/inserisci",
             "/api/promo/aggiorna",
-            "/api/promo/clearAllCaches");
+            "/api/promo-cache/clearAllCaches",
+            "/api/prezzi-cache/clearAllCaches");
     private static final List<String> USER_ENDPOINTS = List.of("/api/articoli/cerca/ean",
             "/api/articoli/cerca/codice",
             "/api/articoli/cerca/descrizione",

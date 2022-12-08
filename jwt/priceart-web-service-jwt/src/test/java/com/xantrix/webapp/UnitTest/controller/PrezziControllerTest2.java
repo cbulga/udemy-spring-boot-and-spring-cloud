@@ -35,7 +35,7 @@ import com.xantrix.webapp.repository.ListinoRepository;
 
 
 //@TestPropertySource(locations="classpath:application-list100.properties")
-@TestPropertySource(properties = {"profilo = std2", "seq = 1"})
+@TestPropertySource(properties = {"profilo = std2", "seq = 1", "ramo="})
 @ContextConfiguration(classes = Application.class)
 @SpringBootTest()
 @TestMethodOrder(OrderAnnotation.class)

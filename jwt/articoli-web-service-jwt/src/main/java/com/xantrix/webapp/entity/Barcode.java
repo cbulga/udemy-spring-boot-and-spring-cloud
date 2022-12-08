@@ -6,6 +6,7 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serial;
 import java.io.Serializable;
 
 @Entity
@@ -15,8 +16,9 @@ import java.io.Serializable;
 @AllArgsConstructor
 @ToString(exclude = {"articolo"})
 public class Barcode implements Serializable {
-    private static final long serialVersionUID = 8682477643109847337L;
 
+    @Serial
+    private static final long serialVersionUID = 8682477643109847337L;
     @Id
     @Column(name = "BARCODE")
 	@NotNull(message = "{NotNull.Barcode.barcode.Validation}")

@@ -1,7 +1,7 @@
 package com.xantrix.webapp.controller;
 
-import com.xantrix.webapp.dtos.InfoMsg;
-import com.xantrix.webapp.service.ArticoliService;
+import com.xantrix.webapp.dto.InfoMsg;
+import com.xantrix.webapp.service.PromoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -13,20 +13,20 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDate;
 
 @RestController
-@RequestMapping(value = "/api/articoli-cache")
+@RequestMapping(value = "/api/promo-cache")
 @Slf4j
 public class CachingController {
 
-    private final ArticoliService articoliService;
+    private final PromoService promoService;
 
-    public CachingController(ArticoliService articoliService) {
-        this.articoliService = articoliService;
+    public CachingController(PromoService promoService) {
+        this.promoService = promoService;
     }
 
     @GetMapping(value = "clearAllCaches", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<InfoMsg> clearAllCaches() {
-        log.info("Clearing all caches");
-        articoliService.cleanCaches();
+        log.info("************** Clearing all caches *************");
+        promoService.cleanCaches();
         return new ResponseEntity<>(InfoMsg.builder()
                 .date(LocalDate.now())
                 .message("Eliminazione della cache eseguita con successo!")

@@ -39,15 +39,15 @@ public class RedisConfig {
 
         GenericJackson2JsonRedisSerializer jackson2JsonRedisSerializer = new GenericJackson2JsonRedisSerializer(objectMapper);
         return RedisCacheConfiguration.defaultCacheConfig()
-                // default time to live della cache: 60 minuti
-                .entryTtl(Duration.ofMinutes(60))
+                // default time to live della cache: 15 minuti
+                .entryTtl(Duration.ofMinutes(15))
                 .disableCachingNullValues()
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jackson2JsonRedisSerializer));
     }
 
 //    @Bean
 //    public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
-//        return builder -> builder.withCacheConfiguration("promozioni", RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(10)))
-//                .withCacheConfiguration("prezzi", RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(5)));
+//        return builder -> builder.withCacheConfiguration("prezzo", RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(10)))
+//                .withCacheConfiguration("listini", RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(5)));
 //    }
 }

@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.io.Serial;
 import java.io.Serializable;
 
 @Entity
@@ -12,8 +13,9 @@ import java.io.Serializable;
 @Data
 @ToString(exclude = {"articolo"})
 public class Ingredienti implements Serializable {
-    private static final long serialVersionUID = -6230810713799336046L;
 
+    @Serial
+    private static final long serialVersionUID = -6230810713799336046L;
     @Id
     @Column(name = "CODART")
     private String codArt;

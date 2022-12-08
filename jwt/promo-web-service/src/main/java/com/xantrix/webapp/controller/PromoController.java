@@ -107,12 +107,6 @@ public class PromoController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/clearAllCaches")
-    public void clearAllCaches() {
-        log.info("************** Clearing all caches *************");
-        promoService.cleanCaches();
-    }
-
     private void handleBindingResult(BindingResult bindingResult) throws BindingException {
         if (bindingResult.hasErrors()) {
             String msgErr = errMessage.getMessage(Objects.requireNonNull(bindingResult.getFieldError()), LocaleContextHolder.getLocale());

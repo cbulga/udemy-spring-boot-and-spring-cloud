@@ -1,12 +1,10 @@
 package com.xantrix.webapp.service;
 
-import com.xantrix.webapp.dto.DettPromoDTO;
-
 public interface PrezziPromoService {
 
-    DettPromoDTO selByCodArtAndPromoAttiva(String codArt);
+    Double selByCodArtAndPromoAttiva(String codArt);
 
-    DettPromoDTO selByCodArtAndFidAndPromoAttiva(String codArt);
+    Double selByCodArtAndFidAndPromoAttiva(String codArt);
 
-    DettPromoDTO selByCodArtAndCodFidAndPromoAttiva(String codArt, String codFid);
+    Double selByCodArtAndCodFidAndPromoAttiva(String codArt, String codFid);
 }

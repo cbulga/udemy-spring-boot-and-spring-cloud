@@ -3,7 +3,7 @@ package com.xantrix.webapp.dtos;
 import lombok.Data;
 
 @Data
-public class PrezzoDto {
+public class PrezzoDTO {
     private String codArt;
     private double prezzo = 0;
     private double sconto = 0;

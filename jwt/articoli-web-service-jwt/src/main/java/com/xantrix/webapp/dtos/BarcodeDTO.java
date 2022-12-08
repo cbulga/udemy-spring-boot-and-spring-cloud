@@ -1,13 +1,18 @@
 package com.xantrix.webapp.dtos;
 
-import lombok.Data;
+import lombok.*;
 
 import java.io.Serializable;
 
 @Data
-public class BarcodeDto implements Serializable {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+public class BarcodeDTO implements Serializable {
 
     private static final long serialVersionUID = -7885944990935907091L;
+    @EqualsAndHashCode.Include
     private String barcode;
     private String idTipoArt;
 }

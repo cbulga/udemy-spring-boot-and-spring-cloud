@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,6 +16,7 @@ import java.util.Set;
 @ToString(exclude = {"articoli"})
 public class Iva implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -5431610347215673719L;
     @Id
     @Column(name = "IDIVA")

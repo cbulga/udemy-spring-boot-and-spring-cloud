@@ -1,11 +1,14 @@
 package com.xantrix.webapp.service;
 
-import com.xantrix.webapp.Resilience4JConfiguration;
-import com.xantrix.webapp.dtos.ArticoliDto;
-import com.xantrix.webapp.dtos.PrezzoDto;
+import com.xantrix.webapp.config.Resilience4JConfiguration;
+import com.xantrix.webapp.dtos.ArticoliDTO;
+import com.xantrix.webapp.dtos.PrezzoDTO;
 import com.xantrix.webapp.entity.Articoli;
 import com.xantrix.webapp.entity.Barcode;
+import com.xantrix.webapp.exception.DuplicateException;
+import com.xantrix.webapp.exception.NotFoundException;
 import com.xantrix.webapp.feign.PriceClient;
+import com.xantrix.webapp.feign.PromoClient;
 import com.xantrix.webapp.repository.ArticoliRepository;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
@@ -36,11 +39,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ArticoliServiceImpl implements ArticoliService {
 
+    public static final String ARTICOLO_NON_PRESENTE_IN_ANAGRAFICA_IMPOSSIBILE_UTILIZZARE_IL_METODO_PUT = "Articolo %s non presente in anagrafica! Impossibile utilizzare il metodo PUT";
+    public static final String ARTICOLO_DUPLICATO_IMPOSSIBILE_UTILIZZARE_IL_METODO_POST = "Articolo %s presente in anagrafica! Impossibile utilizzare il metodo POST";
+    public static final String ARTICOLO_NON_PRESENTE_IN_ANAGRAFICA = "Articolo %s non presente in anagrafica!";
     private final ArticoliRepository articoliRepository;
     private final ModelMapper modelMapper;
     private final CacheManager cacheManager;
     private final CircuitBreakerFactory<?, ?> circuitBreakerFactory;
     private final PriceClient priceClient;
+    private final PromoClient promoClient;
 
 //    //HISTRIX CONSTANT SETTINGS
 //    // altre opzioni https://github.com/Netflix/Hystrix/wiki/Configuration
@@ -50,16 +57,17 @@ public class ArticoliServiceImpl implements ArticoliService {
 //    public static final String SLEEP_TIME_IN_MS = "5000"; //Tempo in ms prima di ripetere tentativo di chiusura del circuito (def 5000) (cioè quanto tempo il circuito resta aperto prima di essere richiuso)
 //    public static final String TIME_METRIC_IN_MS = "5000"; //Tempo base in ms delle metriche statistiche (se in 5 secondi ho almeno il 30% (ERROR_THRESHOLD_PERCENTAGE) di richieste in fallimento o 10 (REQUEST_VOLUME_THRESHOLD) richieste fallite, allora il circuito viene aperto)
 
-    public ArticoliServiceImpl(ArticoliRepository articoliRepository, ModelMapper modelMapper, CacheManager cacheManager, CircuitBreakerFactory<?, ?> circuitBreakerFactory, PriceClient priceClient) {
+    public ArticoliServiceImpl(ArticoliRepository articoliRepository, ModelMapper modelMapper, CacheManager cacheManager, CircuitBreakerFactory<?, ?> circuitBreakerFactory, PriceClient priceClient, PromoClient promoClient) {
         this.articoliRepository = articoliRepository;
         this.modelMapper = modelMapper;
         this.cacheManager = cacheManager;
         this.circuitBreakerFactory = circuitBreakerFactory;
         this.priceClient = priceClient;
+        this.promoClient = promoClient;
     }
 
     @Override
-    @Cacheable
+    @Cacheable(value = "articoli", key = "#descrizione.concat('-').concat(#idList)")
 //    @HystrixCommand(fallbackMethod = "selByDescrizioneFallBack",
 //            commandProperties = {
 //                    @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = FAILURE_TIMOUT_IN_MS),
@@ -68,13 +76,16 @@ public class ArticoliServiceImpl implements ArticoliService {
 //                    @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = SLEEP_TIME_IN_MS),
 //                    @HystrixProperty(name = "metrics.rollingStats.timeInMilliseconds", value = TIME_METRIC_IN_MS)
 //            })
-    public List<ArticoliDto> selByDescrizione(String descrizione, String idList, String authHeader) {
+    public List<ArticoliDTO> selByDescrizione(String descrizione, String idList, String authHeader) {
         List<Articoli> articolis = articoliRepository.findByDescrizioneLike("%" + descrizione.toUpperCase() + "%");
-        List<ArticoliDto> articoliDto = !CollectionUtils.isEmpty(articolis) ? articolis.stream()
+        List<ArticoliDTO> articoliDto = !CollectionUtils.isEmpty(articolis) ? articolis.stream()
                 .filter(Objects::nonNull)
-                .map(a -> modelMapper.map(a, ArticoliDto.class))
+                .map(a -> modelMapper.map(a, ArticoliDTO.class))
                 .collect(Collectors.toList()) : Collections.emptyList();
-        articoliDto.forEach(a -> a.setPrezzo(getPriceArt(a.getCodArt(), idList, authHeader)));
+        articoliDto.forEach(a -> {
+            a.setPrezzo(getPriceArt(a.getCodArt(), idList, authHeader));
+            a.setPrezzoPromo(getPricePromo(a.getCodArt(), authHeader));
+        });
         return articoliDto;
     }
 
@@ -86,7 +97,7 @@ public class ArticoliServiceImpl implements ArticoliService {
 //    }
 
     @Override
-    @Cacheable
+    @Cacheable(value = "articoli", key = "#descrizione.concat('-').concat(#idList).concat('-').concat(#pageable)")
 //    @HystrixCommand(fallbackMethod = "selByDescrizioneFallBack",
 //            commandProperties = {
 //                    @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = FAILURE_TIMOUT_IN_MS),
@@ -95,13 +106,16 @@ public class ArticoliServiceImpl implements ArticoliService {
 //                    @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = SLEEP_TIME_IN_MS),
 //                    @HystrixProperty(name = "metrics.rollingStats.timeInMilliseconds", value = TIME_METRIC_IN_MS)
 //            })
-    public List<ArticoliDto> selByDescrizione(String descrizione, String idList, String authHeader, Pageable pageable) {
+    public List<ArticoliDTO> selByDescrizione(String descrizione, String idList, String authHeader, Pageable pageable) {
         List<Articoli> articolis = articoliRepository.findByDescrizioneLike("%" + descrizione.toUpperCase() + "%", pageable);
-        List<ArticoliDto> articoliDto = !CollectionUtils.isEmpty(articolis) ? articolis.stream()
+        List<ArticoliDTO> articoliDto = !CollectionUtils.isEmpty(articolis) ? articolis.stream()
                 .filter(Objects::nonNull)
-                .map(a -> modelMapper.map(a, ArticoliDto.class))
+                .map(a -> modelMapper.map(a, ArticoliDTO.class))
                 .collect(Collectors.toList()) : Collections.emptyList();
-        articoliDto.forEach(a -> a.setPrezzo(getPriceArt(a.getCodArt(), idList, authHeader)));
+        articoliDto.forEach(a -> {
+            a.setPrezzo(getPriceArt(a.getCodArt(), idList, authHeader));
+            a.setPrezzoPromo(getPricePromo(a.getCodArt(), authHeader));
+        });
         return articoliDto;
     }
 
@@ -113,7 +127,7 @@ public class ArticoliServiceImpl implements ArticoliService {
 //    }
 
     @Override
-    @Cacheable(value = "articolo", key = "#codArt", sync = true)
+    @Cacheable(value = "articolo", key = "#codArt.concat('-').concat(#idList)", unless="#result == null")
 //    @HystrixCommand(fallbackMethod = "selByCodArtFallBack",
 //            commandProperties = {
 //                    @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = FAILURE_TIMOUT_IN_MS),
@@ -122,12 +136,13 @@ public class ArticoliServiceImpl implements ArticoliService {
 //                    @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = SLEEP_TIME_IN_MS),
 //                    @HystrixProperty(name = "metrics.rollingStats.timeInMilliseconds", value = TIME_METRIC_IN_MS)
 //            })
-    public ArticoliDto selByCodArt(String codArt, String idList, String authHeader) {
+    public ArticoliDTO selByCodArt(String codArt, String idList, String authHeader) {
         Articoli articoli = selByCodArt2(codArt);
-        ArticoliDto articoliDto;
+        ArticoliDTO articoliDto;
         if (articoli != null) {
-            articoliDto = modelMapper.map(articoli, ArticoliDto.class);
+            articoliDto = modelMapper.map(articoli, ArticoliDTO.class);
             articoliDto.setPrezzo(getPriceArt(codArt, idList, authHeader));
+            articoliDto.setPrezzoPromo(getPricePromo(codArt, authHeader));
         } else articoliDto = null;
         return articoliDto;
     }
@@ -145,7 +160,7 @@ public class ArticoliServiceImpl implements ArticoliService {
     }
 
     @Override
-    @Cacheable(value = "barcode", key = "#barcode", sync = true)
+    @Cacheable(value = "barcode", key = "#barcode.concat('-').concat(#idList)", unless="#result == null")
 //    @HystrixCommand(fallbackMethod = "selByBarCodeFallBack",
 //            commandProperties = {
 //                    @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = FAILURE_TIMOUT_IN_MS),
@@ -154,11 +169,13 @@ public class ArticoliServiceImpl implements ArticoliService {
 //                    @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = SLEEP_TIME_IN_MS),
 //                    @HystrixProperty(name = "metrics.rollingStats.timeInMilliseconds", value = TIME_METRIC_IN_MS)
 //            })
-    public ArticoliDto selByBarCode(String barcode, String idList, String authHeader) {
+    public ArticoliDTO selByBarCode(String barcode, String idList, String authHeader) {
         Articoli articoli = articoliRepository.selByEan(barcode);
-        ArticoliDto articoliDto = articoli != null ? modelMapper.map(articoli, ArticoliDto.class) : null;
-        if (articoliDto != null)
+        ArticoliDTO articoliDto = articoli != null ? modelMapper.map(articoli, ArticoliDTO.class) : null;
+        if (articoliDto != null) {
             articoliDto.setPrezzo(getPriceArt(articoliDto.getCodArt(), idList, authHeader));
+            articoliDto.setPrezzoPromo(getPricePromo(articoliDto.getCodArt(), authHeader));
+        }
         return articoliDto;
     }
 //
@@ -172,31 +189,79 @@ public class ArticoliServiceImpl implements ArticoliService {
     @Override
     @Transactional
     @Caching(evict = {
-            // tutti i metodi che usano @Cacheable senza parametri avranno la cache svuotata
             @CacheEvict(cacheNames = "articoli", allEntries = true),
-            // tutti i metodi che usano @Cacheable con key = "#barcode" avranno la cache svuotata
-//            @CacheEvict(cacheNames = "barcode", key = "#articolo.barcode[0].barcode"),
-            // tutti i metodi che usano @Cacheable con key = "#codArt" avranno la cache svuotata
-            @CacheEvict(cacheNames = "articolo", key = "#articolo.codArt")
+            @CacheEvict(cacheNames = "articolo", allEntries = true),
+            @CacheEvict(cacheNames = "barcode", allEntries = true)
     })
-    public void delArticolo(Articoli articolo) {
-        articoliRepository.delete(articolo);
-        this.evictCache(articolo.getBarcode());
+    public void delArticolo(String codArt) throws NotFoundException {
+        Articoli articoliToDelete = selByCodArt2(codArt);
+        if (articoliToDelete == null) {
+            String errorMessage = String.format(ARTICOLO_NON_PRESENTE_IN_ANAGRAFICA, codArt);
+            log.warn(errorMessage);
+            throw new NotFoundException(errorMessage);
+        }
+        articoliRepository.delete(articoliToDelete);
+//        this.evictCache(articolo.getBarcode());
     }
 
     @Override
     @Transactional
     @Caching(evict = {
-            // tutti i metodi che usano @Cacheable senza parametri avranno la cache svuotata
             @CacheEvict(cacheNames = "articoli", allEntries = true),
-            // tutti i metodi che usano @Cacheable con key = "#barcode" avranno la cache svuotata per quel barcode
-//            @CacheEvict(cacheNames = "barcode", key = "#articolo.barcode[0].barcode"),
-            // tutti i metodi che usano @Cacheable con key = "#codArt" avranno la cache svuotata per quell'articolo
-            @CacheEvict(cacheNames = "articolo", key = "#articolo.codArt")
+            @CacheEvict(cacheNames = "articolo", allEntries = true),
+            @CacheEvict(cacheNames = "barcode", allEntries = true)
     })
-    public void insArticolo(Articoli articolo) {
-        articoliRepository.save(articolo);
-        this.evictCache(articolo.getBarcode());
+    public void insArticolo(ArticoliDTO articoliDto) throws DuplicateException {
+        log.debug("Verifichiamo la presenza dell'articolo passato");
+        Articoli duplicatedArticoli = selByCodArt2(articoliDto.getCodArt());
+        if (duplicatedArticoli != null) {
+            String errorMessage = String.format(ARTICOLO_DUPLICATO_IMPOSSIBILE_UTILIZZARE_IL_METODO_POST, articoliDto.getCodArt());
+            log.warn(errorMessage);
+            throw new DuplicateException(errorMessage);
+        }
+
+        Articoli articoli = modelMapper.map(articoliDto, Articoli.class);
+        articoli.getBarcode().forEach(barcode -> barcode.setArticolo(articoli));
+        articoliRepository.save(articoli);
+        this.evictCache(articoli.getBarcode());
+    }
+
+    @Override
+    @Transactional
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "articoli", allEntries = true),
+            @CacheEvict(cacheNames = "articolo", allEntries = true),
+            @CacheEvict(cacheNames = "barcode", allEntries = true)
+    })
+    public void updArticolo(ArticoliDTO articoliDto) throws NotFoundException {
+        log.debug("Verifichiamo la presenza dell'articolo passato");
+        Articoli articoliToUpdate = selByCodArt2(articoliDto.getCodArt());
+        if (articoliToUpdate == null) {
+            String errorMessage = String.format(ARTICOLO_NON_PRESENTE_IN_ANAGRAFICA_IMPOSSIBILE_UTILIZZARE_IL_METODO_PUT, articoliDto.getCodArt());
+            log.warn(errorMessage);
+            throw new NotFoundException(errorMessage);
+        }
+
+        Articoli articoli = modelMapper.map(articoliDto, Articoli.class);
+        articoli.getBarcode().forEach(barcode -> barcode.setArticolo(articoliToUpdate));
+        this.evictCache(articoliToUpdate.getBarcode());
+        articoliToUpdate.getBarcode().clear();
+        articoli.getBarcode().forEach(barcode -> {
+            barcode.setArticolo(articoliToUpdate);
+            articoliToUpdate.getBarcode().add(barcode);
+        });
+//        articoliToUpdate.setBarcode(articoli.getBarcode());
+        articoliToUpdate.setDescrizione(articoli.getDescrizione());
+        articoliToUpdate.setUm(articoli.getUm());
+        articoliToUpdate.setCodStat(articoli.getCodStat());
+        articoliToUpdate.setIva(articoli.getIva());
+        articoliToUpdate.setDataCreaz(articoli.getDataCreaz());
+        articoliToUpdate.setIngredienti(articoli.getIngredienti());
+        articoliToUpdate.setFamAssort(articoli.getFamAssort());
+        articoliToUpdate.setIdStatoArt(articoli.getIdStatoArt());
+        articoliToUpdate.setPesoNetto(articoli.getPesoNetto());
+        articoliToUpdate.setPzCart(articoli.getPzCart());
+        articoliRepository.save(articoliToUpdate);
     }
 
     private void evictCache(Set<Barcode> ean) {
@@ -215,16 +280,33 @@ public class ArticoliServiceImpl implements ArticoliService {
         });
     }
 
+    protected double getPricePromo(String codArt, String authHeader) {
+        double prezzoPromo = 0.0;
+
+        log.info("Ottenimento Prezzo Promozionale Codice {}", codArt);
+
+        try {
+            double prezzo = promoClient.getPromoPrice(authHeader, codArt);
+            if (prezzo > 0)
+                log.info("Prezzo promozionale {}", prezzo);
+            prezzoPromo = prezzo;
+        } catch (FeignException ex) {
+            log.warn("Errore: {}", ex.getLocalizedMessage());
+        }
+
+        return prezzoPromo;
+    }
+
     protected double getPriceArt(String codArt, String idList, String authHeader) {
         double prezzo = 0.0;
 
         CircuitBreaker circuitBreaker = circuitBreakerFactory.create(Resilience4JConfiguration.CIRCUIT_BREAKER);
 
         try {
-            ResponseEntity<PrezzoDto> result = StringUtils.isNotEmpty(idList)
+            ResponseEntity<PrezzoDTO> result = StringUtils.isNotEmpty(idList)
                     ? circuitBreaker.run(() -> priceClient.getPriceArt2(authHeader, codArt, idList), throwable -> selPrezzoFallback(codArt, authHeader))
                     : circuitBreaker.run(() -> priceClient.getDefPriceArt2(authHeader, codArt), throwable -> selPrezzoFallback(codArt, authHeader));
-            PrezzoDto prezzoDto = result.getBody();
+            PrezzoDTO prezzoDto = result.getBody();
             assert prezzoDto != null;
             log.info("Prezzo articolo {}: {}", prezzoDto.getCodArt(), prezzoDto.getPrezzo());
             if (prezzoDto.getSconto() > 0) {
@@ -236,13 +318,13 @@ public class ArticoliServiceImpl implements ArticoliService {
             } else
                 prezzo = prezzoDto.getPrezzo();
         } catch (FeignException ex) {
-            log.warn("Errore: {}", ex.getLocalizedMessage());
+            log.warn(ex.getMessage(), ex);
         }
 
         return prezzo;
     }
 
-    protected ResponseEntity<PrezzoDto> selPrezzoFallback(String codArt, String authHeader) {
+    protected ResponseEntity<PrezzoDTO> selPrezzoFallback(String codArt, String authHeader) {
         log.warn("****** selPrezzoFallback in esecuzione ******");
         return priceClient.getDefPriceArt2(authHeader, codArt);
     }

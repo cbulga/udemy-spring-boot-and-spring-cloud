@@ -33,6 +33,15 @@ spring:
         # Maximum interval for backoff (milliseconds to wait before retry to connect to the config server)
         max-interval: 1500
   # ==============================================================
+  # = Redis Parameters
+  # ==============================================================
+  redis:
+    connect-timeout: 2s
+    host: localhost
+    #password: password
+    port: 6379
+    timeout: 1s
+  # ==============================================================
   # = Proprietà RabbitMQ
   # ==============================================================
   rabbitmq:
@@ -43,10 +52,12 @@ spring:
   # ==============================================================
   # = Proprietà Fonte Dati PostgreSQL
   # ==============================================================
+  sql:
+    init:
+      mode: always
+      platform: postgres
   datasource:
-    initialization-mode: always
     password: 123_Stella
-    platform: postgres
     url: jdbc:postgresql://localhost:5433/AlphaShop
     username: postgres
   jpa:
@@ -111,7 +122,7 @@ spring:
 #  userId: Cristian
 #  password: 123Stella
 #  srvUrl: http://localhost:8019/api/utenti/cerca/userid/
-  
+
 ## ==============================================================
 ## = Parametri Sicurezza JWT
 ## ==============================================================

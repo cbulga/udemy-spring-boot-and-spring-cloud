@@ -1,4 +1,4 @@
-package com.xantrix.webapp;
+package com.xantrix.webapp.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

@@ -20,10 +20,12 @@ spring:
 # ==============================================================
 # = DBMS PostgreSQL Parameters
 # ==============================================================
+  sql:
+    init:
+      mode: always
+      platform: postgres
   datasource:
-    initialization-mode: always
     password: 123_Stella
-    platform: postgres
     url: jdbc:postgresql://localhost:5433/AlphaShop
     username: postgres
   jpa:
@@ -37,7 +39,15 @@ spring:
           lob:
             non_contextual_creation: true
     show-sql: true
-
+  # ==============================================================
+  # = Redis Parameters
+  # ==============================================================
+  redis:
+    connect-timeout: 2s
+    host: localhost
+    #password: password
+    port: 6379
+    timeout: 1s
 # ==============================================================
 # = Zipkin Parameters
 # ==============================================================

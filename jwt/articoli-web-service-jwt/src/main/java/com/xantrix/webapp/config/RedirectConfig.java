@@ -1,4 +1,4 @@
-package com.xantrix.webapp;
+package com.xantrix.webapp.config;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;

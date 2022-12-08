@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,8 +15,9 @@ import java.util.Set;
 @Data
 @ToString(exclude = {"articoli"})
 public class FamAssort implements Serializable {
-    private static final long serialVersionUID = 3788120361600509595L;
 
+    @Serial
+    private static final long serialVersionUID = 3788120361600509595L;
     @Id
     @Column(name = "ID")
     private int id;

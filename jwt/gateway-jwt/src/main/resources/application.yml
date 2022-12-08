@@ -64,6 +64,10 @@ spring:
       # = Route Parameters
       # ==============================================================
       routes:
+        - id: cacheArticoliModule
+          uri: lb://ProductsWebService
+          predicates:
+            - Path=/api/articoli-cache/**
         - id: articoliModule
           uri: lb://ProductsWebService
           predicates:
@@ -73,6 +77,10 @@ spring:
               args:
                 name: articoliCircuitBreaker
                 fallbackUri: forward:/articolo-fallback
+        - id: cachePrezziModule
+          uri: lb://PriceArtWebService
+          predicates:
+            - Path=/api/prezzi-cache/**
         - id: prezziModule
           uri: lb://PriceArtWebService
           predicates:
@@ -90,14 +98,18 @@ spring:
           uri: lb://AUTH-SERVICE
           predicates:
             - Path=/auth/**
-        - id: promoModule
+        - id: cachePromoModule
           uri: lb://PromoPrezziWebService
           predicates:
-            - Path=/api/promo/**
+            - Path=/api/promo-cache/**
         - id: prezziPromoModule
           uri: lb://PromoPrezziWebService
           predicates:
             - Path=/api/promo/prezzo/**
+        - id: promoModule
+          uri: lb://PromoPrezziWebService
+          predicates:
+            - Path=/api/promo/**
 
   # ==============================================================
   # = Redis Parameters

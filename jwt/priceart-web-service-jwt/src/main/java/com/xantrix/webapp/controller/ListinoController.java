@@ -1,13 +1,12 @@
 package com.xantrix.webapp.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.xantrix.webapp.dtos.InfoMsg;
+import com.xantrix.webapp.dtos.ListiniDTO;
 import com.xantrix.webapp.entity.Listini;
 import com.xantrix.webapp.exception.BindingException;
 import com.xantrix.webapp.exception.NotFoundException;
 import com.xantrix.webapp.service.ListinoService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.http.HttpHeaders;
@@ -16,16 +15,17 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/listino")
+@Slf4j
 public class ListinoController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ListinoController.class);
     private final ListinoService listiniService;
     private final ResourceBundleMessageSource errMessage;
 
@@ -35,19 +35,19 @@ public class ListinoController {
     }
 
     // ------------------- CERCA LISTINO X ID ------------------------------------
-    @GetMapping(value = "/cerca/id/{idList}")
-    public ResponseEntity<Optional<Listini>> getListById(@PathVariable("idList") String IdList) throws NotFoundException {
+    @GetMapping(value = "/cerca/id/{idList}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Optional<Listini>> getListById(@PathVariable("idList") String idList) throws NotFoundException {
         HttpHeaders headers = new HttpHeaders();
 
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        logger.info("Otteniamo il Listino Numero: " + IdList);
+        log.info("Otteniamo il Listino Numero: {}", idList);
 
-        Optional<Listini> listini = listiniService.selById(IdList);
+        Optional<Listini> listini = listiniService.selById(idList);
 
-        if (!listini.isPresent()) {
-            String errMsg = String.format("Il listino %s non è stato trovato!", IdList);
-            logger.warn(errMsg);
+        if (listini.isEmpty()) {
+            String errMsg = String.format("Il listino %s non è stato trovato!", idList);
+            log.warn(errMsg);
             throw new NotFoundException(errMsg);
         }
 
@@ -55,54 +55,37 @@ public class ListinoController {
     }
 
     // ------------------- INSERISCI LISTINO ------------------------------------
-    @RequestMapping(value = "/inserisci", method = RequestMethod.POST)
-    public ResponseEntity<?> createList(@Valid @RequestBody Listini listino, BindingResult bindingResult,
-                                        UriComponentsBuilder ucBuilder) throws BindingException {
-        logger.info(String.format("Salviamo il listino", listino.getId()));
+    @PostMapping(value = "/inserisci", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<InfoMsg> createList(@Valid @RequestBody ListiniDTO listiniDto, BindingResult bindingResult) throws BindingException {
+        log.info("Salviamo il listino {}", listiniDto.getId());
 
         if (bindingResult.hasErrors()) {
-            String msgErr = errMessage.getMessage(bindingResult.getFieldError(), LocaleContextHolder.getLocale());
-            logger.warn(msgErr);
+            String msgErr = errMessage.getMessage(Objects.requireNonNull(bindingResult.getFieldError()), LocaleContextHolder.getLocale());
+            log.warn(msgErr);
             throw new BindingException(msgErr);
         }
 
-        HttpHeaders headers = new HttpHeaders();
-        ObjectMapper mapper = new ObjectMapper();
+        listiniService.insListino(listiniDto);
 
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        ObjectNode responseNode = mapper.createObjectNode();
-
-        listiniService.insListino(listino);
-
-        responseNode.put("code", HttpStatus.OK.toString());
-        responseNode.put("message", "Inserimento Listino " + listino.getId() + " Eseguito Con Successo");
-
-        return new ResponseEntity<>(responseNode, headers, HttpStatus.CREATED);
+        return new ResponseEntity<>(InfoMsg.builder()
+                .date(LocalDate.now())
+                .code(HttpStatus.OK.toString())
+                .message("Inserimento Listino " + listiniDto.getId() + " Eseguito Con Successo")
+                .build(), HttpStatus.CREATED);
     }
 
     // ------------------- ELIMINAZIONE LISTINO ------------------------------------
-    @RequestMapping(value = "/elimina/{idList}", method = RequestMethod.DELETE, produces = "application/json")
-    public ResponseEntity<?> deleteList(@PathVariable("idList") String idList)
+    @DeleteMapping(value = "/elimina/{idList}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<InfoMsg> deleteList(@PathVariable("idList") String idList)
             throws NotFoundException {
-        logger.info("Eliminiamo il listino {}", idList);
+        log.info("Eliminiamo il listino {}", idList);
 
-        Optional<Listini> listino = listiniService.selById(idList);
+        listiniService.delListino(idList);
 
-        if (!listino.isPresent()) {
-            String msgErr = String.format("Listino %s non presente in anagrafica!", idList);
-            logger.warn(msgErr);
-            throw new NotFoundException(msgErr);
-        }
-
-        listiniService.delListino(listino.get());
-
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode responseNode = mapper.createObjectNode();
-
-        responseNode.put("code", HttpStatus.OK.toString());
-        responseNode.put("message", "Eliminazione Listino " + idList + " Eseguita Con Successo");
-
-        return new ResponseEntity<>(responseNode, new HttpHeaders(), HttpStatus.OK);
+        return new ResponseEntity<>(InfoMsg.builder()
+                .date(LocalDate.now())
+                .code(HttpStatus.OK.toString())
+                .message("Eliminazione Listino " + idList + " Eseguita Con Successo")
+                .build(), HttpStatus.OK);
     }
 }

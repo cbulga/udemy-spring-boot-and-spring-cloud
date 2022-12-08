@@ -1,13 +1,18 @@
 package com.xantrix.webapp.dtos;
 
-import lombok.Data;
+import lombok.*;
 
 import java.io.Serializable;
 
 @Data
-public class IvaDto implements Serializable {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+public class IvaDTO implements Serializable {
 
     private static final long serialVersionUID = 7970056696778029108L;
+    @EqualsAndHashCode.Include
     private int idIva;
     private String descrizione;
     private int aliquota;

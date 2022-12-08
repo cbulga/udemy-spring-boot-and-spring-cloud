@@ -1,10 +1,9 @@
 package com.xantrix.webapp.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.xantrix.webapp.appconf.AppConfig;
-import com.xantrix.webapp.dtos.PrezzoDto;
-import com.xantrix.webapp.entity.DettListini;
+import com.xantrix.webapp.dtos.DettListiniDTO;
+import com.xantrix.webapp.dtos.InfoMsg;
+import com.xantrix.webapp.dtos.PrezzoDTO;
 import com.xantrix.webapp.service.PrezziService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,12 +12,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @RestController
@@ -27,6 +26,7 @@ import java.util.Optional;
 @Tag(name = "PrezziController", description = "Controller Operazioni di ottenimento e eliminazione prezzo articolo")
 public class PrezziController {
 
+    public static final String PREZZO_ARTICOLO_ASSENTE = "Prezzo Articolo Assente!!";
     private final PrezziService prezziService;
     private final AppConfig config;
 
@@ -45,13 +45,13 @@ public class PrezziController {
 
         log.info("Listino di Riferimento: {}", idList);
 
-        DettListini prezzo = prezziService.selPrezzo(codArt, idList);
+        DettListiniDTO prezzo = prezziService.selPrezzo(codArt, idList);
 
         if (prezzo != null) {
             log.info("Prezzo Articolo: " + prezzo.getPrezzo());
             retVal = prezzo.getPrezzo();
         } else {
-            log.warn("Prezzo Articolo Assente!!");
+            log.warn(PREZZO_ARTICOLO_ASSENTE);
         }
 
         return retVal;
@@ -77,7 +77,7 @@ public class PrezziController {
 
         log.info("Listino di Riferimento: " + idList);
 
-        DettListini prezzo = prezziService.selPrezzo(codArt, idList);
+        DettListiniDTO prezzo = prezziService.selPrezzo(codArt, idList);
 
         if (prezzo != null) {
             log.info("Prezzo Articolo: {}", prezzo.getPrezzo());
@@ -86,7 +86,7 @@ public class PrezziController {
                 log.info("Attivato sconto {}%", sconto);
             retVal = Math.round(prezzo.getPrezzo() * (1 - (sconto / 100)) * 100) / 100.0;
         } else
-            log.warn("Prezzo Articolo Assente!!");
+            log.warn(PREZZO_ARTICOLO_ASSENTE);
 
         return retVal;
     }
@@ -94,15 +94,15 @@ public class PrezziController {
 
     @RefreshScope
     @GetMapping(value = {"info/{codart}/{idlist}", "info/{codart}"})
-    public ResponseEntity<PrezzoDto> getPriceCodArt2(@PathVariable("codart") String CodArt,
+    public ResponseEntity<PrezzoDTO> getPriceCodArt2(@PathVariable("codart") String codArt,
                                                      @PathVariable("idlist") Optional<String> optIdList) {
-        PrezzoDto retVal = new PrezzoDto();
+        PrezzoDTO retVal = new PrezzoDTO();
 
-        String idList = (optIdList.isPresent()) ? optIdList.get() : config.getListino();
+        String idList = optIdList.orElseGet(config::getListino);
 
         log.info("Listino di Riferimento: " + idList);
 
-        DettListini prezzo = prezziService.selPrezzo(CodArt, idList);
+        DettListiniDTO prezzo = prezziService.selPrezzo(codArt, idList);
 
         if (prezzo != null) {
             log.info("Prezzo Articolo: " + prezzo.getPrezzo());
@@ -110,37 +110,31 @@ public class PrezziController {
             double sconto = config.getSconto();
             int tipo = config.getTipo();
 
-            retVal.setCodArt(CodArt);
+            retVal.setCodArt(codArt);
             retVal.setPrezzo(prezzo.getPrezzo());
             retVal.setSconto(sconto);
             retVal.setTipo(tipo);
         } else {
-            log.warn("Prezzo Articolo Assente!!");
-            return new ResponseEntity<PrezzoDto>(retVal, HttpStatus.NOT_FOUND);
+            log.warn(PREZZO_ARTICOLO_ASSENTE);
+            return new ResponseEntity<>(retVal, HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<PrezzoDto>(retVal, HttpStatus.OK);
+        return new ResponseEntity<>(retVal, HttpStatus.OK);
     }
 
     // ------------------- DELETE PREZZO LISTINO ------------------------------------
-    @RequestMapping(value = "/elimina/{codart}/{idlist}", method = RequestMethod.DELETE)
-    public ResponseEntity<?> deletePrice(@PathVariable("codart") String codArt, @PathVariable("idlist") String idList) {
+    @DeleteMapping(value = "/elimina/{codart}/{idlist}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<InfoMsg> deletePrice(@PathVariable("codart") String codArt, @PathVariable("idlist") String idList) {
         log.info(String.format("Eliminazione prezzo listino %s dell'articolo %s", idList, codArt));
-
-        HttpHeaders headers = new HttpHeaders();
-        ObjectMapper mapper = new ObjectMapper();
-
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        ObjectNode responseNode = mapper.createObjectNode();
 
         prezziService.delPrezzo(codArt, idList);
 
-        responseNode.put("code", HttpStatus.OK.toString());
-        responseNode.put("message", "Eliminazione Prezzo Eseguita Con Successo");
-
         log.info("Eliminazione Prezzo Eseguita Con Successo");
 
-        return new ResponseEntity<>(responseNode, headers, HttpStatus.OK);
+        return new ResponseEntity<>(InfoMsg.builder()
+                .date(LocalDate.now())
+                .code(HttpStatus.OK.toString())
+                .message("Eliminazione Prezzo Eseguita Con Successo")
+                .build(), HttpStatus.OK);
     }
 }

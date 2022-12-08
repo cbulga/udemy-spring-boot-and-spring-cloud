@@ -72,6 +72,7 @@ class SelectArtTest {
     void testListArtByEan() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get(apiBaseUrl + "/cerca/ean/8008490000021")
                 .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 //articoli
@@ -109,9 +110,8 @@ class SelectArtTest {
                 .andExpect(jsonPath("$.iva.descrizione").exists())
                 .andExpect(jsonPath("$.iva.descrizione").value("IVA RIVENDITA 22%"))
                 .andExpect(jsonPath("$.iva.aliquota").exists())
-                .andExpect(jsonPath("$.iva.aliquota").value("22"))
+                .andExpect(jsonPath("$.iva.aliquota").value("22"));
 
-                .andDo(print());
     }
 
     @Test
@@ -122,10 +122,10 @@ class SelectArtTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonData)
                 .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.codice").value(404))
-                .andExpect(jsonPath("$.messaggio").value(String.format(BARCODE_NOT_FOUND, barCode)))
-                .andDo(print());
+                .andExpect(jsonPath("$.messaggio").value(String.format(BARCODE_NOT_FOUND, barCode)));
     }
 
     @Test

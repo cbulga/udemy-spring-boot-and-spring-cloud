@@ -2,7 +2,6 @@ package com.xantrix.webapp.controller;
 
 import com.xantrix.webapp.service.PrezziPromoService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,20 +23,20 @@ public class PrezziPromoController {
     }
 
     @GetMapping(value = "/{codArt}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getPromoCodArt(@PathVariable("codArt") @NotNull String codArt) {
+    public ResponseEntity<Double> getPromoCodArt(@PathVariable("codArt") @NotNull String codArt) {
         log.info("****** Otteniamo il prezzo della promo attiva con codArt {} ******", codArt);
-        return new ResponseEntity<>(prezziPromoService.selByCodArtAndPromoAttiva(codArt).getOggetto(), HttpStatus.OK);
+        return ResponseEntity.ok(prezziPromoService.selByCodArtAndPromoAttiva(codArt));
     }
 
     @GetMapping(value = "/fidelity/{codArt}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getPromoCodArtFid(@PathVariable("codArt") @NotNull String codArt) {
+    public ResponseEntity<Double> getPromoCodArtFid(@PathVariable("codArt") @NotNull String codArt) {
         log.info("****** Otteniamo il prezzo della promo attiva riservata a fidelity con codArt {} ******", codArt);
-        return new ResponseEntity<>(prezziPromoService.selByCodArtAndFidAndPromoAttiva(codArt).getOggetto(), HttpStatus.OK);
+        return ResponseEntity.ok(prezziPromoService.selByCodArtAndFidAndPromoAttiva(codArt));
     }
 
     @GetMapping(value = "/{codArt}/{codFid}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getPromoCodArtCodFid(@PathVariable("codArt") @NotNull String codArt, @PathVariable("codFid") String codFid) {
+    public ResponseEntity<Double> getPromoCodArtCodFid(@PathVariable("codArt") @NotNull String codArt, @PathVariable("codFid") String codFid) {
         log.info("****** Otteniamo il prezzo della promo attiva riservata a fidelity con codArt {} e codFid {} ******", codArt, codFid);
-        return new ResponseEntity<>(prezziPromoService.selByCodArtAndCodFidAndPromoAttiva(codArt, codFid).getOggetto(), HttpStatus.OK);
+        return ResponseEntity.ok(prezziPromoService.selByCodArtAndCodFidAndPromoAttiva(codArt, codFid));
     }
 }

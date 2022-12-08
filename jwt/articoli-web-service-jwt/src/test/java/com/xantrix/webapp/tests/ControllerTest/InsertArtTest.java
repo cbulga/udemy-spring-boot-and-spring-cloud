@@ -17,7 +17,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static com.xantrix.webapp.controller.ArticoliController.*;
+import static com.xantrix.webapp.controller.ArticoliController.ELIMINAZIONE_ARTICOLO_ESEGUITA_CON_SUCCESSO;
+import static com.xantrix.webapp.controller.ArticoliController.INSERIMENTO_ARTICOLO_ESEGUITO_CON_SUCCESSO;
+import static com.xantrix.webapp.service.ArticoliServiceImpl.ARTICOLO_DUPLICATO_IMPOSSIBILE_UTILIZZARE_IL_METODO_POST;
+import static com.xantrix.webapp.service.ArticoliServiceImpl.ARTICOLO_NON_PRESENTE_IN_ANAGRAFICA;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;

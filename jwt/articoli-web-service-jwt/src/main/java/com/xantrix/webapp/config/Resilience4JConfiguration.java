@@ -1,4 +1,4 @@
-package com.xantrix.webapp;
+package com.xantrix.webapp.config;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.timelimiter.TimeLimiterConfig;

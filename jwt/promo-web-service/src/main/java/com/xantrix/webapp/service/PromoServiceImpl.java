@@ -313,7 +313,7 @@ public class PromoServiceImpl implements PromoService {
             log.warn("Errore: {}", ex.getLocalizedMessage());
         }
 
-        return null;
+        return ArticoliDTO.builder().descrizione("").prezzo(0.0).build();
     }
 
     protected ResponseEntity<ArticoliDTO> selArticoloFallback(String codArt, String authHeader) {

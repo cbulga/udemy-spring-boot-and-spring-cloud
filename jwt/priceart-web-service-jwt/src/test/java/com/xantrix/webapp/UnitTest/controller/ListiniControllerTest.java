@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = Application.class)
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@TestPropertySource(properties = {"profilo = list100", "seq = 1"})
+@TestPropertySource(properties = {"profilo = list100", "seq = 1", "ramo="})
 public class ListiniControllerTest {
 
     private MockMvc mockMvc;
@@ -39,7 +39,7 @@ public class ListiniControllerTest {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
     }
 
-    String JsonData = "{\n" +
+    String jsonData = "{\n" +
             "    \"id\": \"100\",\n" +
             "    \"descrizione\": \"Listino Test 100\",\n" +
             "    \"obsoleto\": \"No\",\n" +
@@ -56,12 +56,12 @@ public class ListiniControllerTest {
     public void testInsListino() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/listino/inserisci")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(JsonData)
+                        .content(jsonData)
                         .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.code").value("200 OK"))
-                .andExpect(jsonPath("$.message").value("Inserimento Listino 100 Eseguito Con Successo"))
-                .andDo(print());
+                .andExpect(jsonPath("$.message").value("Inserimento Listino 100 Eseguito Con Successo"));
 
         assertThat(listinoRepository.findById("100"))
                 .isNotEmpty();
@@ -72,6 +72,7 @@ public class ListiniControllerTest {
     public void testGetListById() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/listino/cerca/id/100")
                         .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").exists())
