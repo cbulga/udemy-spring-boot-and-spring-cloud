@@ -1,0 +1,46 @@
+version: "3"
+
+networks: 
+  ELK-NETWORK:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 173.23.0.0/24
+volumes:
+  elk-volume:
+
+services:
+  elasticsearch:
+    image: elasticsearch:7.17.8
+    networks: 
+      ELK-NETWORK:
+        ipv4_address: 173.23.0.4
+    ports: 
+    - "9200:9200"
+    - "9300:9300"
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      discovery.type: single-node
+  kibana:
+    image: kibana:7.17.8
+    networks: 
+      ELK-NETWORK:
+        ipv4_address: 173.23.0.5
+    ports:
+    - "5601:5601"
+    depends_on:
+    - elasticsearch
+  logstash:
+    image: logstash:7.17.8
+    networks: 
+      ELK-NETWORK:
+        ipv4_address: 173.23.0.6
+    depends_on:
+      - elasticsearch
+    command: logstash -f /etc/logstash/conf.d/logstash.conf
+    volumes:
+      - ./logstash.conf:/etc/logstash/conf.d/logstash.conf
+      - /home/cristian/tmp/Udemy/spring-cloud-course/logs:/usr/share/logstash/pipeline
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
