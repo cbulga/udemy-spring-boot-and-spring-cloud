@@ -11,7 +11,7 @@ spring:
   cloud:
     config:
       # indirizzo riferimento config server
-      uri: http://localhost:8888
+      uri: ${CONFIG_URL_1:http://localhost:8888},${CONFIG_URL_1:http://localhost:8889}
       # profilo attivo
       profile: ${profilo}
       # branch git da usare da cui caricare la configurazione del config server

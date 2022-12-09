@@ -25,7 +25,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Integration test: config server needs to be started
  */
-@TestPropertySource(properties = {"profilo=list100", "seq=1", "ramo="})
+//@TestPropertySource(properties = {"profilo=list100", "seq=1", "ramo="})
+@TestPropertySource(properties = {"profilo = test", "seq = 1", "ramo = main"})
 @ContextConfiguration(classes = Application.class)
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -108,6 +109,7 @@ class PrezziControllerTest {
                 .andDo(print());
     }
 
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
     @AfterEach
     void clearData() {
         Optional<Listini> listinoTest = listinoRepository.findById(idList);

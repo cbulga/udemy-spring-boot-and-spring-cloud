@@ -1,39 +1,96 @@
 # ==============================================================
-# = Config Server Base
+# = Config Server multi profilo con autenticazione
+# = end point: http://localhost:8888/{application-name}/{profile}[/{label}]
+# = avvio: java -jar '-Dspring.profiles.active=peer1' -XX:MaxRAM=72m -XX:+UseSerialGC -Xss512k configserver-0.0.1-SNAPSHOT.jar --enpwd=123_Stella --uspwd=BimBumBam_2018 --adpwd=MagicaBula_2018
 # ==============================================================
 server:
   port: 8888
 
 # ==============================================================
-# = Profilo Attivo
+# = Profilo Attivo PEER 1
 # ==============================================================
 spring:
   config:
-    use-legacy-processing: false
-  profiles:
-    active: github
+    activate:
+      on-profile: peer1
+  application:
+    name: ConfigServer
+  # ==============================================================
+  # = Cloud Parameters
+  # ==============================================================
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/cbulga/udemy-spring-boot-and-spring-cloud-git-config-repository.git
+          username: cbulga
+          password: <password serve solo se repository privato, se pubblico è accessibile a chiunque>
+          cloneOnStart: true
+          timeout: 4 # in seconds
+          #default-label: main
+    # ==============================================================
+    # = Bus Parameters
+    # ==============================================================
+    bus:
+      #id: ${spring.application.name}:${spring.profiles.active}:${random.uuid}
+      enabled: true
+  kafka:
+    bootstrap-servers:
+      - ${KAFKA_ADDR:http://localhost:29092}
+    client-id: ${spring.application.name}:${spring.profiles.active}:${random.uuid}
+
+# ==============================================================
+# = Eureka Properties
+# = Nota: prima di attivare il servizio servono tre heartbeat
+# ==============================================================
+eureka:
+  # ==============================================================
+  # = Impostazioni Instance
+  # ==============================================================
+  instance:
+    #intervallo di attesa prima della rimozione del servizio (def 90 sec)
+    lease-expiration-duration-in-seconds: 60
+    #intervallo di invio dell'heartbeat (def 30 sec)
+    leaseRenewalIntervalInSeconds: 15
+    #id di identificazione dell'istanza
+    instanceId: ${server.port}-${spring.application.name}-1
+    #registrazione per indirizzo ip (defualt hostname)
+    preferIpAddress: true
+  # ==============================================================
+  # = Impostazioni Client
+  # ==============================================================
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: ${EUREKA_URL_1:http://user:BimBumBam_2018@localhost:8761/eureka/},${EUREKA_URL_2:http://user:BimBumBam_2018@localhost:8762/eureka/},${EUREKA_URL_3:http://user:BimBumBam_2018@localhost:8763/eureka/}
+    #time out di connessione in secondi al server Eureka (def 5 sec)
+    eureka-server-connect-timeout-seconds: 8
+
 # ==============================================================
 # = Actuator Parameters
 # ==============================================================
 management:
+  info:
+    env:
+      enabled: true
   endpoint:
     health:
       show-details: WHEN_AUTHORIZED
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,hystrix.stream
-
-#endpoint: http://localhost:8888/{application-name}/{profile}[/{label}]
+        include: health,info,metrics,refresh,bus-refresh,bus-env,hystrix.stream
 
 # ==============================================================
 # = Logs Parameters
 # ==============================================================
 logging:
   level:
-    org.springframework.cloud: DEBUG
-    org.springframework.security: DEBUG
-    com.xantrix: DEBUG
+    org:
+      springframework:
+        cloud: DEBUG
+        security: DEBUG
 
 sicurezza:
   userpwd: ${uspwd}
@@ -42,4 +99,103 @@ sicurezza:
 jasypt:
   encryptor:
     # password passata come variabile da linea di comando al comando mvn di build per produrre un jar con già valorizzata questa property. Es.: mvn clean install -Denpwd=123_Stella.
+    password: ${enpwd}
+
+---
+
+server:
+  port: 8889
+
+# ==============================================================
+# = Profilo Attivo PEER 2
+# ==============================================================
+spring:
+  config:
+    activate:
+      on-profile: peer2
+  application:
+    name: ConfigServer
+  # ==============================================================
+  # = Cloud Parameters
+  # ==============================================================
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/cbulga/udemy-spring-boot-and-spring-cloud-git-config-repository.git
+          username: cbulga
+          password: <password serve solo se repository privato, se pubblico è accessibile a chiunque>
+          cloneOnStart: true
+          timeout: 4 # in seconds
+          #default-label: main
+    # ==============================================================
+    # = Bus Parameters
+    # ==============================================================
+    bus:
+      #id: ${spring.application.name}:${spring.profiles.active}:${random.uuid}
+      enabled: true
+  kafka:
+    bootstrap-servers:
+      - ${KAFKA_ADDR:http://localhost:29092}
+    client-id: ${spring.application.name}:${spring.profiles.active}:${random.uuid}
+
+# ==============================================================
+# = Eureka Properties
+# = Nota: prima di attivare il servizio servono tre heartbeat
+# ==============================================================
+eureka:
+  # ==============================================================
+  # = Impostazioni Instance
+  # ==============================================================
+  instance:
+    #intervallo di attesa prima della rimozione del servizio (def 90 sec)
+    lease-expiration-duration-in-seconds: 60
+    #intervallo di invio dell'heartbeat (def 30 sec)
+    leaseRenewalIntervalInSeconds: 15
+    #id di identificazione dell'istanza
+    instanceId: ${server.port}-${spring.application.name}-2
+    #registrazione per indirizzo ip (defualt hostname)
+    preferIpAddress: true
+  # ==============================================================
+  # = Impostazioni Client
+  # ==============================================================
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: ${EUREKA_URL_1:http://user:BimBumBam_2018@localhost:8761/eureka/},${EUREKA_URL_2:http://user:BimBumBam_2018@localhost:8762/eureka/},${EUREKA_URL_3:http://user:BimBumBam_2018@localhost:8763/eureka/}
+    #time out di connessione in secondi al server Eureka (def 5 sec)
+    eureka-server-connect-timeout-seconds: 8
+
+# ==============================================================
+# = Actuator Parameters
+# ==============================================================
+management:
+  info:
+    env:
+      enabled: true
+  endpoint:
+    health:
+      show-details: WHEN_AUTHORIZED
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,refresh,bus-refresh,bus-env,hystrix.stream
+
+# ==============================================================
+# = Logs Parameters
+# ==============================================================
+logging:
+  level:
+    org:
+      springframework:
+        cloud: DEBUG
+        security: DEBUG
+
+sicurezza:
+  userpwd: ${uspwd}
+  adminpwd: ${adpwd}
+
+jasypt:
+  encryptor:
     password: ${enpwd}

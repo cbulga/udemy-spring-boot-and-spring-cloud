@@ -34,7 +34,8 @@ import com.xantrix.webapp.entity.Listini;
 import com.xantrix.webapp.repository.ListinoRepository;
 
 
-//@TestPropertySource(locations="classpath:application-list100.properties")
+//@TestPropertySource(locations="classpath:application-list100.yml")
+@SuppressWarnings("NewClassNamingConvention")
 @TestPropertySource(properties = {"profilo = std2", "seq = 1", "ramo="})
 @ContextConfiguration(classes = Application.class)
 @SpringBootTest()
@@ -81,7 +82,7 @@ class PrezziControllerTest2 {
 
     @Test
     @Order(1)
-    public void testGetPrzCodArt() throws Exception {
+    void testGetPrzCodArt() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/prezzi/" + codArt)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -92,7 +93,7 @@ class PrezziControllerTest2 {
 
     @Test
     @Order(2)
-    public void testGetPrzCodArt2() throws Exception {
+    void testGetPrzCodArt2() throws Exception {
         String Url = String.format("/api/prezzi/%s/%s", codArt, idList2);
 
         mockMvc.perform(MockMvcRequestBuilders.get(Url)
@@ -105,7 +106,7 @@ class PrezziControllerTest2 {
 
     @Test
     @Order(3)
-    public void testDelPrezzo() throws Exception {
+    void testDelPrezzo() throws Exception {
         String url = String.format("/api/prezzi/elimina/%s/%s/", codArt, idList);
 
         mockMvc.perform(MockMvcRequestBuilders.delete(url)
@@ -116,6 +117,7 @@ class PrezziControllerTest2 {
                 .andDo(print());
     }
 
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
     @AfterAll
     public void ClearData() {
         Optional<Listini> listinoTest = listinoRepository.findById(idList);

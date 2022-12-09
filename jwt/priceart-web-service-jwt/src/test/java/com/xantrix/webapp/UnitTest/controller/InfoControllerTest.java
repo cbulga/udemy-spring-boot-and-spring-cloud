@@ -20,11 +20,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Integration test: config server needs to be started
  */
-@TestPropertySource(properties = {"profilo=list100", "seq=1", "ramo="})
+//@TestPropertySource(properties = {"profilo = list100", "seq=1", "ramo="})
+@TestPropertySource(properties = {"profilo = test", "seq = 1", "ramo = main"})
 @ContextConfiguration(classes = Application.class)
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class InfoControllerTest {
+class InfoControllerTest {
 
     private MockMvc mockMvc;
 
@@ -37,7 +38,7 @@ public class InfoControllerTest {
     }
 
     @Test
-    public void testGetInfo() throws Exception {
+    void testGetInfo() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/info")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

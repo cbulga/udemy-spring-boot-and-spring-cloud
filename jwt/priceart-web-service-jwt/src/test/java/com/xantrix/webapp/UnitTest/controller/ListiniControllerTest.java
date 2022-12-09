@@ -23,8 +23,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = Application.class)
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@TestPropertySource(properties = {"profilo = list100", "seq = 1", "ramo="})
-public class ListiniControllerTest {
+//@TestPropertySource(properties = {"profilo = list100", "seq = 1", "ramo="})
+@TestPropertySource(properties = {"profilo = test", "seq = 1", "ramo = main"})
+class ListiniControllerTest {
 
     private MockMvc mockMvc;
 
@@ -39,21 +40,22 @@ public class ListiniControllerTest {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
     }
 
-    String jsonData = "{\n" +
-            "    \"id\": \"100\",\n" +
-            "    \"descrizione\": \"Listino Test 100\",\n" +
-            "    \"obsoleto\": \"No\",\n" +
-            "    \"dettListini\": [\n" +
-            "        {\n" +
-            "            \"id\": -1,\n" +
-            "            \"codArt\": \"002000301\",\n" +
-            "            \"prezzo\": 1.00\n" +
-            "        }]\n" +
-            "}";
+    String jsonData = """
+            {
+                "id": "100",
+                "descrizione": "Listino Test 100",
+                "obsoleto": "No",
+                "dettListini": [
+                    {
+                        "id": -1,
+                        "codArt": "002000301",
+                        "prezzo": 1.00
+                    }]
+            }""";
 
     @Test
     @Order(1)
-    public void testInsListino() throws Exception {
+    void testInsListino() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/listino/inserisci")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonData)
@@ -69,7 +71,7 @@ public class ListiniControllerTest {
 
     @Test
     @Order(2)
-    public void testGetListById() throws Exception {
+    void testGetListById() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/listino/cerca/id/100")
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -89,7 +91,7 @@ public class ListiniControllerTest {
 
     @Test
     @Order(3)
-    public void testDelListino() throws Exception {
+    void testDelListino() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/listino/elimina/100")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -100,7 +102,7 @@ public class ListiniControllerTest {
 
     @Test
     @Order(4)
-    public void testErrDelListino() throws Exception {
+    void testErrDelListino() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/listino/elimina/999")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
