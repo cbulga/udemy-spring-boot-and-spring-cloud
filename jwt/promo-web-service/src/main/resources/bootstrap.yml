@@ -186,6 +186,6 @@ eureka:
     fetchRegistry: true
     serviceUrl:
       # BimBumBam_2018: password specified in the eurekasrv => bootstrap.yml => sicurezza.userpwd parameter (decoded value is BimBumBam_2018)
-      defaultZone: ${EUREKA_URL:http://user:BimBumBam_2018@localhost:8761/eureka/}
+      defaultZone: ${EUREKA_URL_1:http://user:BimBumBam_2018@localhost:8761/eureka/},${EUREKA_URL_2:http://user:BimBumBam_2018@localhost:8762/eureka/},${EUREKA_URL_3:http://user:BimBumBam_2018@localhost:8763/eureka/}
     # time out di connessione in secondi al server Eureka (def 5 sec)
     eureka-server-connect-timeout-seconds: 8
