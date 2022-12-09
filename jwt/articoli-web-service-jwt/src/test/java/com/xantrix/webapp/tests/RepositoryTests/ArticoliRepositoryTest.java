@@ -12,6 +12,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.HashSet;
 import java.util.List;
@@ -23,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest()
 @ContextConfiguration(classes = Application.class)
 @TestMethodOrder(OrderAnnotation.class)
+@TestPropertySource(properties = {"profilo = test", "seq = 1", "ramo = main"})
 class ArticoliRepositoryTest {
 
     public static final String COD_ART_TEST = "500123456789";

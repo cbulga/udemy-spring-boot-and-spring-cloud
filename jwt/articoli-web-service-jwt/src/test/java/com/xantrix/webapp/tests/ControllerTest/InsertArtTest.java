@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -29,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = Application.class)
 @SpringBootTest
 @TestMethodOrder(OrderAnnotation.class)
+@TestPropertySource(properties = {"profilo = test", "seq = 1", "ramo = main"})
 class InsertArtTest {
 
     @Autowired
@@ -49,32 +51,33 @@ class InsertArtTest {
     private final String ApiBaseUrl = "/api/articoli";
 
     String JsonData =
-            "{\r\n" +
-                    "    \"codArt\": \"500123456789\",\r\n" +
-                    "    \"descrizione\": \"Articoli Unit Test Inserimento\",\r\n" +
-                    "    \"um\": \"PZ\",\r\n" +
-                    "    \"codStat\": \"TESTART\",\r\n" +
-                    "    \"pzCart\": 6,\r\n" +
-                    "    \"pesoNetto\": 1.75,\r\n" +
-                    "    \"idStatoArt\": \"1 \",\r\n" +
-                    "    \"dataCreaz\": \"2019-05-14\",\r\n" +
-                    "    \"barcode\": [\r\n" +
-                    "        {\r\n" +
-                    "            \"barcode\": \"12345678\",\r\n" +
-                    "            \"idTipoArt\": \"CP\"\r\n" +
-                    "        }\r\n" +
-                    "    ],\r\n" +
-                    "    \"ingredienti\": null,\r\n" +
-                    "    \"iva\": {\r\n" +
-                    "        \"idIva\": 22,\r\n" +
-                    "        \"descrizione\": \"IVA RIVENDITA 22%\",\r\n" +
-                    "        \"aliquota\": 22\r\n" +
-                    "    },\r\n" +
-                    "    \"famAssort\": {\r\n" +
-                    "        \"id\": 1,\r\n" +
-                    "        \"descrizione\": \"DROGHERIA ALIMENTARE\"\r\n" +
-                    "    }\r\n" +
-                    "}";
+            """
+                    {\r
+                        "codArt": "500123456789",\r
+                        "descrizione": "Articoli Unit Test Inserimento",\r
+                        "um": "PZ",\r
+                        "codStat": "TESTART",\r
+                        "pzCart": 6,\r
+                        "pesoNetto": 1.75,\r
+                        "idStatoArt": "1 ",\r
+                        "dataCreaz": "2019-05-14",\r
+                        "barcode": [\r
+                            {\r
+                                "barcode": "12345678",\r
+                                "idTipoArt": "CP"\r
+                            }\r
+                        ],\r
+                        "ingredienti": null,\r
+                        "iva": {\r
+                            "idIva": 22,\r
+                            "descrizione": "IVA RIVENDITA 22%",\r
+                            "aliquota": 22\r
+                        },\r
+                        "famAssort": {\r
+                            "id": 1,\r
+                            "descrizione": "DROGHERIA ALIMENTARE"\r
+                        }\r
+                    }""";
 
     @Test
     @Order(1)
@@ -108,33 +111,35 @@ class InsertArtTest {
                 .andDo(print());
     }
 
+    //<<< Articolo privo di descrizione
     String ErrJsonData =
-            "{\r\n" +
-                    "    \"codArt\": \"500123456789\",\r\n" +
-                    "    \"descrizione\": \"\",\r\n" +  //<<< Articolo privo di descrizione
-                    "    \"um\": \"PZ\",\r\n" +
-                    "    \"codStat\": \"TESTART\",\r\n" +
-                    "    \"pzCart\": 6,\r\n" +
-                    "    \"pesoNetto\": 1.75,\r\n" +
-                    "    \"idStatoArt\": \"1 \",\r\n" +
-                    "    \"dataCreaz\": \"2019-05-14\",\r\n" +
-                    "    \"barcode\": [\r\n" +
-                    "        {\r\n" +
-                    "            \"barcode\": \"12345678\",\r\n" +
-                    "            \"idTipoArt\": \"CP\"\r\n" +
-                    "        }\r\n" +
-                    "    ],\r\n" +
-                    "    \"ingredienti\": null,\r\n" +
-                    "    \"iva\": {\r\n" +
-                    "        \"idIva\": 22,\r\n" +
-                    "        \"descrizione\": \"IVA RIVENDITA 22%\",\r\n" +
-                    "        \"aliquota\": 22\r\n" +
-                    "    },\r\n" +
-                    "    \"famAssort\": {\r\n" +
-                    "        \"id\": 1,\r\n" +
-                    "        \"descrizione\": \"DROGHERIA ALIMENTARE\"\r\n" +
-                    "    }\r\n" +
-                    "}";
+            """
+                    {\r
+                        "codArt": "500123456789",\r
+                        "descrizione": "",\r
+                        "um": "PZ",\r
+                        "codStat": "TESTART",\r
+                        "pzCart": 6,\r
+                        "pesoNetto": 1.75,\r
+                        "idStatoArt": "1 ",\r
+                        "dataCreaz": "2019-05-14",\r
+                        "barcode": [\r
+                            {\r
+                                "barcode": "12345678",\r
+                                "idTipoArt": "CP"\r
+                            }\r
+                        ],\r
+                        "ingredienti": null,\r
+                        "iva": {\r
+                            "idIva": 22,\r
+                            "descrizione": "IVA RIVENDITA 22%",\r
+                            "aliquota": 22\r
+                        },\r
+                        "famAssort": {\r
+                            "id": 1,\r
+                            "descrizione": "DROGHERIA ALIMENTARE"\r
+                        }\r
+                    }""";
 
     @Test
     @Order(3)
@@ -149,33 +154,35 @@ class InsertArtTest {
                 .andDo(print());
     }
 
+    //<<< Modifica Stato Articolo a 2
     String JsonDataMod =
-            "{\r\n" +
-                    "    \"codArt\": \"500123456789\",\r\n" +
-                    "    \"descrizione\": \"Articoli Unit Test Inserimento\",\r\n" +
-                    "    \"um\": \"PZ\",\r\n" +
-                    "    \"codStat\": \"TESTART\",\r\n" +
-                    "    \"pzCart\": 6,\r\n" +
-                    "    \"pesoNetto\": 1.75,\r\n" +
-                    "    \"idStatoArt\": \"2 \",\r\n" + //<<< Modifica Stato Articolo a 2
-                    "    \"dataCreaz\": \"2019-05-14\",\r\n" +
-                    "    \"barcode\": [\r\n" +
-                    "        {\r\n" +
-                    "            \"barcode\": \"12345678\",\r\n" +
-                    "            \"idTipoArt\": \"CP\"\r\n" +
-                    "        }\r\n" +
-                    "    ],\r\n" +
-                    "    \"ingredienti\": null,\r\n" +
-                    "    \"iva\": {\r\n" +
-                    "        \"idIva\": 22,\r\n" +
-                    "        \"descrizione\": \"IVA RIVENDITA 22%\",\r\n" +
-                    "        \"aliquota\": 22\r\n" +
-                    "    },\r\n" +
-                    "    \"famAssort\": {\r\n" +
-                    "        \"id\": 1,\r\n" +
-                    "        \"descrizione\": \"DROGHERIA ALIMENTARE\"\r\n" +
-                    "    }\r\n" +
-                    "}";
+            """
+                    {\r
+                        "codArt": "500123456789",\r
+                        "descrizione": "Articoli Unit Test Inserimento",\r
+                        "um": "PZ",\r
+                        "codStat": "TESTART",\r
+                        "pzCart": 6,\r
+                        "pesoNetto": 1.75,\r
+                        "idStatoArt": "2 ",\r
+                        "dataCreaz": "2019-05-14",\r
+                        "barcode": [\r
+                            {\r
+                                "barcode": "12345678",\r
+                                "idTipoArt": "CP"\r
+                            }\r
+                        ],\r
+                        "ingredienti": null,\r
+                        "iva": {\r
+                            "idIva": 22,\r
+                            "descrizione": "IVA RIVENDITA 22%",\r
+                            "aliquota": 22\r
+                        },\r
+                        "famAssort": {\r
+                            "id": 1,\r
+                            "descrizione": "DROGHERIA ALIMENTARE"\r
+                        }\r
+                    }""";
 
     @Test
     @Order(4)
@@ -194,33 +201,35 @@ class InsertArtTest {
                 .isEqualTo("2");
     }
 
+    //<<< Modifica Stato Articolo a 2
     String ErrJsonDataMod =
-            "{\r\n" +
-                    "    \"codArt\": \"500999888777\",\r\n" +
-                    "    \"descrizione\": \"Articoli Unit Test Inserimento\",\r\n" +
-                    "    \"um\": \"PZ\",\r\n" +
-                    "    \"codStat\": \"TESTART\",\r\n" +
-                    "    \"pzCart\": 6,\r\n" +
-                    "    \"pesoNetto\": 1.75,\r\n" +
-                    "    \"idStatoArt\": \"2 \",\r\n" + //<<< Modifica Stato Articolo a 2
-                    "    \"dataCreaz\": \"2019-05-14\",\r\n" +
-                    "    \"barcode\": [\r\n" +
-                    "        {\r\n" +
-                    "            \"barcode\": \"12345678\",\r\n" +
-                    "            \"idTipoArt\": \"CP\"\r\n" +
-                    "        }\r\n" +
-                    "    ],\r\n" +
-                    "    \"ingredienti\": null,\r\n" +
-                    "    \"iva\": {\r\n" +
-                    "        \"idIva\": 22,\r\n" +
-                    "        \"descrizione\": \"IVA RIVENDITA 22%\",\r\n" +
-                    "        \"aliquota\": 22\r\n" +
-                    "    },\r\n" +
-                    "    \"famAssort\": {\r\n" +
-                    "        \"id\": 1,\r\n" +
-                    "        \"descrizione\": \"DROGHERIA ALIMENTARE\"\r\n" +
-                    "    }\r\n" +
-                    "}";
+            """
+                    {\r
+                        "codArt": "500999888777",\r
+                        "descrizione": "Articoli Unit Test Inserimento",\r
+                        "um": "PZ",\r
+                        "codStat": "TESTART",\r
+                        "pzCart": 6,\r
+                        "pesoNetto": 1.75,\r
+                        "idStatoArt": "2 ",\r
+                        "dataCreaz": "2019-05-14",\r
+                        "barcode": [\r
+                            {\r
+                                "barcode": "12345678",\r
+                                "idTipoArt": "CP"\r
+                            }\r
+                        ],\r
+                        "ingredienti": null,\r
+                        "iva": {\r
+                            "idIva": 22,\r
+                            "descrizione": "IVA RIVENDITA 22%",\r
+                            "aliquota": 22\r
+                        },\r
+                        "famAssort": {\r
+                            "id": 1,\r
+                            "descrizione": "DROGHERIA ALIMENTARE"\r
+                        }\r
+                    }""";
 
     @Test
     @Order(5)

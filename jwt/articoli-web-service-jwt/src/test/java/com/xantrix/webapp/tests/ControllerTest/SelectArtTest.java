@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -23,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = Application.class)
 @SpringBootTest
 @TestMethodOrder(OrderAnnotation.class)
+@TestPropertySource(properties = {"profilo = test", "seq = 1", "ramo = main"})
 class SelectArtTest {
     private MockMvc mockMvc;
 
@@ -39,32 +41,33 @@ class SelectArtTest {
     private final String apiBaseUrl = "/api/articoli";
 
     String jsonData =
-            "{\n" +
-                    "    \"codArt\": \"002000301\",\n" +
-                    "    \"descrizione\": \"ACQUA ULIVETO 15 LT\",\n" +
-                    "    \"um\": \"PZ\",\n" +
-                    "    \"codStat\": \"\",\n" +
-                    "    \"pzCart\": 6,\n" +
-                    "    \"pesoNetto\": 1.5,\n" +
-                    "    \"idStatoArt\": \"1\",\n" +
-                    "    \"dataCreazione\": \"2010-06-14\",\n" +
-                    "    \"barcode\": [\n" +
-                    "        {\n" +
-                    "            \"barcode\": \"8008490000021\",\n" +
-                    "            \"idTipoArt\": \"CP\"\n" +
-                    "        }\n" +
-                    "    ],\n" +
-                    "    \"famAssort\": {\n" +
-                    "        \"id\": 1,\n" +
-                    "        \"descrizione\": \"DROGHERIA ALIMENTARE\"\n" +
-                    "    },\n" +
-                    "    \"ingredienti\": null,\n" +
-                    "    \"iva\": {\n" +
-                    "        \"idIva\": 22,\n" +
-                    "        \"descrizione\": \"IVA RIVENDITA 22%\",\n" +
-                    "        \"aliquota\": 22\n" +
-                    "    }\n" +
-                    "}";
+            """
+                    {
+                        "codArt": "002000301",
+                        "descrizione": "ACQUA ULIVETO 15 LT",
+                        "um": "PZ",
+                        "codStat": "",
+                        "pzCart": 6,
+                        "pesoNetto": 1.5,
+                        "idStatoArt": "1",
+                        "dataCreazione": "2010-06-14",
+                        "barcode": [
+                            {
+                                "barcode": "8008490000021",
+                                "idTipoArt": "CP"
+                            }
+                        ],
+                        "famAssort": {
+                            "id": 1,
+                            "descrizione": "DROGHERIA ALIMENTARE"
+                        },
+                        "ingredienti": null,
+                        "iva": {
+                            "idIva": 22,
+                            "descrizione": "IVA RIVENDITA 22%",
+                            "aliquota": 22
+                        }
+                    }""";
 
 
     @Test
