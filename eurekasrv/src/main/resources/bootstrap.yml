@@ -1,0 +1,37 @@
+# ==============================================================
+# = Eureka Server Versione Base
+# = Dash: http://localhost:8761
+# ==============================================================
+server:
+  port: 8761
+  tomcat:
+    threads:
+      max: 5
+
+spring:
+  application:
+    name: EurekaServer
+  # ==============================================================
+  # = Proprietà Config Server
+  # ==============================================================
+  cloud:
+    config:
+      # indirizzo riferimento config server
+      uri: http://localhost:8888
+      # profilo attivo
+      profile: ${profilo}
+      # branch git da usare da cui caricare la configurazione del config server
+      #label: list3
+      label: ${ramo}
+      # username and password to authenticate into the config server
+      username: user
+      password: BimBumBam_2018
+      # if fail-fast is true, the microservice will throw an exception during startup when it does not authenticate successfully in the config server
+      fail-fast: true
+      # timeout on waiting to connect to the Config Server
+      request-connect-timeout: 5
+      retry:
+        # Maximum number of attempts of reconnect to the config server
+        max-attempts: 10
+        # Maximum interval for backoff (milliseconds to wait before retry to connect to the config server)
+        max-interval: 1500
