@@ -1,15 +1,26 @@
+#Config Server
+java -jar '-Dspring.profiles.active=peer1' -XX:MaxRAM=72m -XX:+UseSerialGC -Xss512k config-server-0.0.1-SNAPSHOT.jar --enpwd=123_Stella --uspwd=BimBumBam_2018 --adpwd=MagicaBula_2018
+java -jar '-Dspring.profiles.active=peer1' -XX:MaxRAM=72m -XX:+UseSerialGC -Xss512k config-server-0.0.1-SNAPSHOT.jar --enpwd=123_Stella --uspwd=BimBumBam_2018 --adpwd=MagicaBula_2018
+
+#Eureka Server
+java -jar '-Dspring.profiles.active=peer1' -XX:MaxRAM=64m -XX:+UseSerialGC -Xss512k  eurekasrv-0.0.1-SNAPSHOT.jar
+java -jar '-Dspring.profiles.active=peer2' -XX:MaxRAM=64m -XX:+UseSerialGC -Xss512k  eurekasrv-0.0.1-SNAPSHOT.jar
+
+#Gateway Server
+java -jar -XX:MaxRAM=128m -XX:+UseSerialGC -Xss512k gateway-jwt-0.0.1-SNAPSHOT.jar --profilo=prod --ramo=master
+
 #PriceArt WS
-# mvn clean package --profilo=std --seq=1
-java -jar -Dseq=1 -Dprofilo=std -Dramo=main -XX:MaxRAM=98m -XX:+UseSerialGC -Xss512k priceart-web-service-oauth2-0.0.1-SNAPSHOT.jar &
-java -jar -Dseq=2 -Dprofilo=std -Dramo=main -XX:MaxRAM=98m -XX:+UseSerialGC -Xss512k priceart-web-service-oauth2-0.0.1-SNAPSHOT.jar &
-java -jar -Dseq=3 -Dprofilo=std -Dramo=main -XX:MaxRAM=98m -XX:+UseSerialGC -Xss512k priceart-web-service-oauth2-0.0.1-SNAPSHOT.jar
+# mvn clean package --profilo=prod --seq=1
+java -jar -Dseq=1 -Dprofilo=prod -Dramo=main -XX:MaxRAM=98m -XX:+UseSerialGC -Xss512k priceart-web-service-jwt-0.0.1-SNAPSHOT.jar &
+java -jar -Dseq=2 -Dprofilo=prod -Dramo=main -XX:MaxRAM=98m -XX:+UseSerialGC -Xss512k priceart-web-service-jwt-0.0.1-SNAPSHOT.jar &
+java -jar -Dseq=3 -Dprofilo=prod -Dramo=main -XX:MaxRAM=98m -XX:+UseSerialGC -Xss512k priceart-web-service-jwt-0.0.1-SNAPSHOT.jar
 
 #Articoli WS
-java -jar -Dseq=1 -Dprofilo=std -XX:MaxRAM=98m -XX:+UseSerialGC -Xss512k articoli-web-service-0.0.1-SNAPSHOT.jar &
-java -jar -Dseq=2 -Dprofilo=std -XX:MaxRAM=98m -XX:+UseSerialGC -Xss512k articoli-web-service-0.0.1-SNAPSHOT.jar
+java -jar -Dseq=1 -Dprofilo=prod --ramo=main -XX:MaxRAM=98m -XX:+UseSerialGC -Xss512k articoli-web-service-jwt-0.0.1-SNAPSHOT.jar &
+java -jar -Dseq=2 -Dprofilo=prod --ramo=main -XX:MaxRAM=98m -XX:+UseSerialGC -Xss512k articoli-web-service-jwt-0.0.1-SNAPSHOT.jar
 
 #Promo WS (?)
-java -jar -Dseq=1 -Dprofilo=std -XX:MaxRAM=98m -XX:+UseSerialGC -Xss512k PromoWebService-0.0.1-SNAPSHOT.jar
+java -jar -Dseq=1 -Dprofilo=prod --ramo=main -XX:MaxRAM=98m -XX:+UseSerialGC -Xss512k promo-web-service-0.0.1-SNAPSHOT.jar
 
 #GestUser WS
 java -jar -XX:MaxRAM=72m -XX:+UseSerialGC -Xss512k gestuser-web-service-0.0.1-SNAPSHOT.jar
@@ -17,16 +28,8 @@ java -jar -XX:MaxRAM=72m -XX:+UseSerialGC -Xss512k gestuser-web-service-0.0.1-SN
 #AuthServerJWT WS
 java -jar -XX:MaxRAM=58m -XX:+UseSerialGC -Xss512k jwt-auth-server-0.0.1-SNAPSHOT.jar
 
-#ConfigServer WS
-java -jar -XX:MaxRAM=58m -XX:+UseSerialGC -Xss512k config-server-0.0.1-SNAPSHOT.jar
-java -jar -Dspring.profiles.active=peer1 -XX:MaxRAM=58m -XX:+UseSerialGC -Xss512k config-server-0.0.1-SNAPSHOT.jar
-
-#EurekaServer
-java -jar -XX:MaxRAM=58m -XX:+UseSerialGC -Xss512k eurekasrv-0.0.1-SNAPSHOT.jar
-java -jar -Dspring.profiles.active=peer1 -XX:MaxRAM=58m -XX:+UseSerialGC -Xss512k eurekasrv-0.0.1-SNAPSHOT.jar
-
-#ZUUL
-java -jar -Dprofilo=std -XX:MaxRAM=58m -XX:+UseSerialGC -Xss512k ZuulServer-0.0.1-SNAPSHOT.jar
+#ZUUL - (sostituito da Gateway Server)
+#java -jar -Dprofilo=std -XX:MaxRAM=58m -XX:+UseSerialGC -Xss512k ZuulServer-0.0.1-SNAPSHOT.jar
 
 #Histrix
-java -jar -XX:MaxRAM=58m -XX:+UseSerialGC -Xss512k HystrixDashboard-0.0.1-SNAPSHOT.jar
+#java -jar -XX:MaxRAM=58m -XX:+UseSerialGC -Xss512k HystrixDashboard-0.0.1-SNAPSHOT.jar
