@@ -1,0 +1,55 @@
+# ==============================================================
+# = Ordini Web Service - Versione Base
+# ==============================================================
+spring:
+  application:
+    name: OrdiniWebService
+  # ==============================================================
+  # = Proprietà Config Server
+  # ==============================================================
+  cloud:
+    config:
+      # indirizzo riferimento config server (disabilitato siccome viene ricavato dall'Eureka server)
+      # uri: http://localhost:8888
+      # profilo attivo
+      profile: ${profilo}
+      # branch git da usare da cui caricare la configurazione del config server
+      #label: list3
+      label: ${ramo}
+      # if fail-fast is true, the microservice will throw an exception during startup when it does not authenticate successfully in the config server
+      fail-fast: true
+      # username and password to authenticate into the config server
+      username: user
+      password: BimBumBam_2018
+
+      discovery:
+        service-id: CONFIGSERVER
+        enabled: true
+
+# ==============================================================
+# = Eureka Properties
+# = Nota: prima di attivare il servizio servono tre heartbeat
+# ==============================================================
+eureka:
+  # ==============================================================
+  # = Impostazioni Instance
+  # ==============================================================
+  instance:
+    #intervallo di attesa prima della rimozione del servizio (def 90 sec)
+    lease-expiration-duration-in-seconds: 60
+    #intervallo di invio dell'heartbeat (def 30 sec)
+    leaseRenewalIntervalInSeconds: 15
+    #id di identificazione dell'istanza
+    instanceId: ${server.port}-${spring.application.name}-${seq}
+    #registrazione per indirizzo ip (defualt hostname)
+    preferIpAddress: true
+  # ==============================================================
+  # = Impostazioni Client
+  # ==============================================================
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: ${EUREKA_URL_1:http://user:BimBumBam_2018@localhost:8761/eureka/},${EUREKA_URL_2:http://user:BimBumBam_2018@localhost:8762/eureka/},${EUREKA_URL_3:http://user:BimBumBam_2018@localhost:8763/eureka/}
+    #time out di connessione in secondi al server Eureka (def 5 sec)
+    eureka-server-connect-timeout-seconds: 8

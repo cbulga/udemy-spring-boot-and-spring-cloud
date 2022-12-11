@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.xantrix.webapp</groupId>
-    <artifactId>clienti-web-service</artifactId>
+    <artifactId>ordini-web-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>clienti-web-service</name>
-    <description>Web Api Gestione Clienti</description>
+    <name>ordini-web-service</name>
+    <description>Web Api Gestione Ordini</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
