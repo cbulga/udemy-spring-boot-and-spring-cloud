@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -23,10 +24,17 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ContextConfiguration(classes = Application.class)
+/**
+ * The following web-services have to be up & running:<ul>
+ *     <li>config server</li>
+ *     <li>eureka</li>
+ * </ul>
+ */
 @SpringBootTest
+@TestPropertySource(properties = {"profilo = test", "seq = 9", "ramo = main"})
+@ContextConfiguration(classes = Application.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class UtentiControllerTest {
+class UtentiControllerTest {
 
     private MockMvc mockMvc;
 
@@ -45,14 +53,15 @@ public class UtentiControllerTest {
     }
 
     String jsonData =
-            "{\n" +
-                    "    \"userId\": \"Cristian\",\n" +
-                    "    \"password\": \"123Stella\",\n" +
-                    "    \"attivo\": \"Si\",\n" +
-                    "    \"ruoli\": [\n" +
-                    "            \"USER\"\n" +
-                    "        ]\n" +
-                    "}";
+            """
+                    {
+                        "userId": "Cristian",
+                        "password": "123Stella",
+                        "attivo": "Si",
+                        "ruoli": [
+                                "USER"
+                            ]
+                    }""";
 
     @Test
     @Order(1)
@@ -81,6 +90,7 @@ public class UtentiControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/utenti/cerca/userid/Cristian")
                         .characterEncoding(StandardCharsets.UTF_8.toString())
                         .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 
@@ -92,24 +102,24 @@ public class UtentiControllerTest {
                 .andExpect(jsonPath("$.attivo").value("Si"))
 
                 .andExpect(jsonPath("$.ruoli[0]").exists())
-                .andExpect(jsonPath("$.ruoli[0]").value("USER"))
-                .andDo(print());
+                .andExpect(jsonPath("$.ruoli[0]").value("USER"));
 
         assertThat(passwordEncoder.matches("123Stella",
                 utentiRepository.findByUserId("Cristian").getPassword()))
-                .isEqualTo(true);
+                .isTrue();
     }
 
     String jsonData2 =
-            "{\n" +
-                    "    \"userId\": \"Admin\",\n" +
-                    "    \"password\": \"VerySecretPwd\",\n" +
-                    "    \"attivo\": \"Si\",\n" +
-                    "    \"ruoli\": [\n" +
-                    "            \"USER\",\n" +
-                    "            \"ADMIN\"\n" +
-                    "        ]\n" +
-                    "}";
+            """
+                    {
+                        "userId": "Admin",
+                        "password": "VerySecretPwd",
+                        "attivo": "Si",
+                        "ruoli": [
+                                "USER",
+                                "ADMIN"
+                            ]
+                    }""";
 
     @Test
     @Order(3)
@@ -119,37 +129,39 @@ public class UtentiControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonData2)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andDo(print());
+                .andDo(print())
+                .andExpect(status().isCreated());
     }
 
     String jsonDataUsers =
-            "[\n" +
-                    "	{\n" +
-                    "	    \"userId\": \"Cristian\",\n" +
-                    "	    \"password\": \"123Stella\",\n" +
-                    "	    \"attivo\": \"Si\",\n" +
-                    "	    \"ruoli\": [\n" +
-                    "		    \"USER\"\n" +
-                    "		]\n" +
-                    "	},\n" +
-                    "	{\n" +
-                    "	    \"userId\": \"Admin\",\n" +
-                    "	    \"password\": \"VerySecretPwd\",\n" +
-                    "	    \"attivo\": \"Si\",\n" +
-                    "	    \"ruoli\": [\n" +
-                    "		    \"USER\",\n" +
-                    "		    \"ADMIN\"\n" +
-                    "		]\n" +
-                    "	}\n" +
-                    "]";
+            """
+                    [
+                    	{
+                    	    "userId": "Cristian",
+                    	    "password": "123Stella",
+                    	    "attivo": "Si",
+                    	    "ruoli": [
+                    		    "USER"
+                    		]
+                    	},
+                    	{
+                    	    "userId": "Admin",
+                    	    "password": "VerySecretPwd",
+                    	    "attivo": "Si",
+                    	    "ruoli": [
+                    		    "USER",
+                    		    "ADMIN"
+                    		]
+                    	}
+                    ]""";
 
     @Test
     @Order(4)
-    public void testGetAllUser() throws Exception {
+    void testGetAllUser() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/utenti/cerca/tutti")
                         .characterEncoding(StandardCharsets.UTF_8.toString())
                         .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -173,36 +185,38 @@ public class UtentiControllerTest {
                 .andExpect(jsonPath("$[1].ruoli[0]").value("USER"))
                 .andExpect(jsonPath("$[1].ruoli[1]").exists())
                 .andExpect(jsonPath("$[1].ruoli[1]").value("ADMIN"))
-                .andDo(print())
                 .andReturn();
 
+        assertThat(passwordEncoder.matches("123Stella",
+                utentiRepository.findByUserId("Cristian").getPassword()))
+                .isTrue();
         assertThat(passwordEncoder.matches("VerySecretPwd",
                 utentiRepository.findByUserId("Admin").getPassword()))
-                .isEqualTo(true);
+                .isTrue();
     }
 
 //    @Test
 //    @Order(5)
-//    public void testDelUtente1() throws Exception {
+//    void testDelUtente1() throws Exception {
 //        mockMvc.perform(MockMvcRequestBuilders.delete("/api/utenti/elimina/Cristian")
 //                        .characterEncoding(StandardCharsets.UTF_8.toString())
 //                        .accept(MediaType.APPLICATION_JSON))
+//                .andDo(print())
 //                .andExpect(status().isOk())
 //                .andExpect(jsonPath("$.code").value("200 OK"))
-//                .andExpect(jsonPath("$.message").value("Eliminazione Utente Cristian Eseguita Con Successo"))
-//                .andDo(print());
+//                .andExpect(jsonPath("$.message").value("Eliminazione Utente Cristian Eseguita Con Successo"));
 //    }
 //
 //    @Test
 //    @Order(6)
-//    public void testDelUtente2() throws Exception {
+//    void testDelUtente2() throws Exception {
 //        mockMvc.perform(MockMvcRequestBuilders.delete("/api/utenti/elimina/Admin")
 //                        .characterEncoding(StandardCharsets.UTF_8.toString())
 //                        .accept(MediaType.APPLICATION_JSON))
+//                .andDo(print())
 //                .andExpect(status().isOk())
 //                .andExpect(jsonPath("$.code").value("200 OK"))
-//                .andExpect(jsonPath("$.message").value("Eliminazione Utente Admin Eseguita Con Successo"))
-//                .andDo(print());
+//                .andExpect(jsonPath("$.message").value("Eliminazione Utente Admin Eseguita Con Successo"));
 //    }
 }
 

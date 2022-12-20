@@ -1,4 +1,4 @@
-package com.xantrix.webapp;
+package com.xantrix.webapp.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

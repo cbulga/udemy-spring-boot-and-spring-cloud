@@ -10,7 +10,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -25,11 +24,14 @@ public class JWTWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userDetailsService;
     private final String authenticationPath;
+    private final String refreshPath;
 
     public JWTWebSecurityConfig(@Qualifier("customUserDetailsService") UserDetailsService userDetailsService,
-                                @Value("${sicurezza.uri}") String authenticationPath) {
+                                @Value("${sicurezza.uri}") String authenticationPath,
+                                @Value("${sicurezza.refresh}") String refreshPath) {
         this.userDetailsService = userDetailsService;
         this.authenticationPath = authenticationPath;
+        this.refreshPath = refreshPath;
     }
 
     @Autowired
@@ -53,14 +55,18 @@ public class JWTWebSecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity.csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeRequests().anyRequest().authenticated();
+                .authorizeRequests()
+                .antMatchers(HttpMethod.POST, authenticationPath).permitAll()
+                .antMatchers(HttpMethod.GET, refreshPath).permitAll()
+                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .anyRequest().authenticated();
     }
 
-    @Override
-    public void configure(WebSecurity webSecurity) throws Exception {
-        webSecurity.ignoring().antMatchers(HttpMethod.POST, authenticationPath)
-                .antMatchers(HttpMethod.OPTIONS, "/**")
-                .and().ignoring()
-                .antMatchers(HttpMethod.GET);
-    }
+//    @Override
+//    public void configure(WebSecurity webSecurity) throws Exception {
+//        webSecurity.ignoring().antMatchers(HttpMethod.POST, authenticationPath)
+//                .antMatchers(HttpMethod.OPTIONS, "/**")
+//                .and().ignoring()
+//                .antMatchers(HttpMethod.GET);
+//    }
 }

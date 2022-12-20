@@ -13,7 +13,7 @@ import java.util.List;
 public class UtentiServiceImpl implements UtentiService {
 
     @Autowired
-    UtentiRepository utentiRepository;
+    private UtentiRepository utentiRepository;
 
     @Override
     public List<Utenti> selTutti() {

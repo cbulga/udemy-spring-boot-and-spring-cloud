@@ -1,0 +1,134 @@
+<section class="content-main" style="max-width: 760px">
+
+    <div class="content-header">
+		<h2 class="content-title">{{title}}</h2>
+		<div>
+			<button class="btn btn-outline-danger" (click)=abort()> × Annulla</button>
+		</div>
+	</div>
+
+	<div class="card mb-4">
+    <div class="card-body">
+
+     <div class="alert alert-success" *ngIf='Conferma'>
+        {{Conferma}}
+    </div>
+     <div class="alert alert-danger" *ngIf='Errore'>
+        {{Errore}}
+    </div>
+
+
+    <form (ngSubmit)="artForm.valid && salva()" #artForm="ngForm">
+
+
+		<!-- Codice, Barcode -->
+		<div class="row gx-2">
+			<div class="col-sm-6 mb-3">
+				<label for="codArt" class="form-label">Codice Articolo:</label>
+				<input id="codArt" name="codArt"  type="text" placeholder="" class="form-control" [(ngModel)]="articolo.codArt"
+        required minlength="5" maxlength="30" #codice="ngModel" >
+        <span style="color:red" *ngIf="codice.invalid && (codice.dirty || codice.touched)">
+          Il codice articolo deve essere compreso fra 5 e 30 caratteri
+        </span>
+			</div>
+			<div class="col-sm-6 mb-3">
+				<label for="ean" class="form-label">Barcode:</label>
+				<input id="ean" disabled  type="text" placeholder="" class="form-control" value={{Ean}}>
+			</div>
+		</div>
+
+		<!--Descrizione -->
+    <div class="mb-4">
+			<label class="form-label">Descrizione Articolo</label>
+			<textarea placeholder="" name="desArt" class="form-control" rows="2" [(ngModel)]="articolo.descrizione"
+      required  minlength="6" maxlength="80" #desart="ngModel"></textarea>
+      <span style="color:red" *ngIf="desart.invalid && (desart.dirty || desart.touched)">
+        Il campo descrizione deve avere un numero di caratteri compreso tra 6 e 80
+      </span>
+		</div>
+
+		<!--Unità di misura, Iva -->
+        <div class="row gx-2">
+			<div class="col-sm-6 mb-3">
+				<label class="form-label">Unità di Misura</label>
+				<select class="form-select" name="um" [(ngModel)]="articolo.um">
+					<option value="PZ"> Pezzi </option>
+					<option value="LT"> Litri </option>
+					<option value="KG"> Kilogrammi </option>
+				</select>
+			</div>
+			<div class="col-sm-6 mb-3">
+				<label class="form-label">Iva</label>
+				<select class="form-select" name="iva"  [(ngModel)]="articolo.iva.idIva">
+          <option value="-1" class="text-primary font-weight-bolder">--- Seleziona Iva ---</option>
+					<option [ngValue]="iva.idIva" *ngFor="let iva of Iva">{{iva.descrizione}}</option>
+				</select>
+			</div>
+		</div> <!-- row.// -->
+
+		<!-- Pezzi per cartone, Peso, Prezzo, Valuta -->
+        <div class="mb-4">
+        	<label class="form-label">Pezzi Per Cartone: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Peso Netto:</label>
+            <div class="row gx-2">
+            <div class="col-3">
+				<input placeholder="Pezzi" name="pezzi" type="text" class="form-control" [(ngModel)]="articolo.pzCart"
+          required #pzcart="ngModel" maxlength="3">
+          <span style="color:red" *ngIf="pzcart.invalid && (pzcart.dirty || pzcart.touched)">
+            Il pezzi per cartone devono essere presenti ed avere un valore massimo di 100
+          </span>
+            </div>
+            <div class="col-3">
+            	<input placeholder="Peso" name="peso" type="text" class="form-control" [(ngModel)]="articolo.pesoNetto"
+              required #peso="ngModel" maxlength="5">
+              <span style="color:red" *ngIf="peso.invalid && (peso.dirty || peso.touched)">
+                Il Peso Netto deve avere un valore compreso tra 0.01 e 100
+              </span>
+            </div>
+            <div class="col-4">
+				<input placeholder="Prezzo" type="text" class="form-control">
+			</div>
+			<div class="col-2">
+				<select class="form-select">
+					<option> EUR </option>
+					<option> USD </option>
+					<option> GBP </option>
+				</select>
+			</div>
+          </div>
+        </div>
+
+		<!-- Categoria, Stato Articolo -->
+        <div class="row gx-2">
+			<div class="col-sm-6 mb-3">
+				<label class="form-label">Categoria:</label>
+
+				<select class="form-select" name="cat" [(ngModel)]="articolo.famAssort.id">
+          <option [ngValue]="categoria.id" *ngFor="let categoria of Cat">{{categoria.id}} - {{categoria.descrizione}}</option>
+				</select>
+			</div>
+				<div class="col-sm-6 mb-3">
+				<label class="form-label">Stato:</label>
+				<select class="form-select" name="stato" [(ngModel)]="articolo.idStatoArt">
+					<option value=1> Attivo </option>
+					<option value=2> Sospeso </option>
+					<option value=3> Eliminato </option>
+				</select>
+				</div>
+		</div> <!-- row.// -->
+
+		<!-- Immagine -->
+		<div class="mb-4">
+			<label class="form-label">Immagine:</label>
+			<input class="form-control" type="file">
+		</div>
+
+    <br>
+    <button type="submit" class="btn btn-primary" [disabled]="artForm.invalid">Salva Articolo</button>
+
+
+    </form>
+
+    </div>
+</div>
+
+</section>

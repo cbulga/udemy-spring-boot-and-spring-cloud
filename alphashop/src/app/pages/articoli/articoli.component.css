@@ -1,0 +1,78 @@
+.btn-light {
+  background-color: #fff;
+  border-color: rgba(108, 117, 125, 0.25);
+  margin-left: 2%;
+  margin-right: 2%;
+
+}
+
+.table thead th {
+  color: #adb5bd;
+  font-weight: 400;
+}
+
+.dropdown {
+  display: inline-block;
+
+}
+
+.table thead th {
+  color: #adb5bd;
+  font-weight: 400;
+}
+
+.table-lg td, .table-lg th {
+  padding: 0.8rem 1rem;
+}
+
+ul.row, ul.row-sm {
+  list-style: none;
+  padding: 0;
+}
+
+.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+  background-color: azure;
+}
+
+
+.tbl-string {
+  padding-top: 16px;
+  font-size: 103%;
+}
+
+.infoBadge {
+  font-size: 110%;
+  font-weight: bold;
+}
+
+.ngx-pagination{
+  margin-bottom:0 !important;
+}
+.ngx-pagination li{
+  margin-right: -1px !important;
+}
+.ngx-pagination li.current{
+  background-color: #007bff !important;
+  border: 1px solid #007bff !important;
+  padding: 6px 12px !important;
+  z-index: 999999 !important;
+  position: relative;
+}
+.ngx-pagination li a:focus{
+  outline:none;
+}
+.ngx-pagination a, .ngx-pagination button{
+  color: #007bff !important;
+  background-color: #fff !important;
+  border: 1px solid #dee2e6 !important;
+  padding: 6px 12px !important;
+
+}
+.ngx-pagination .disabled{
+  color: #6c757d !important;
+  pointer-events: none  !important;
+  cursor: auto  !important;
+  background-color: #fff  !important;
+  border: 1px solid #dee2e6  !important;
+  padding: 6px 12px !important;
+}
