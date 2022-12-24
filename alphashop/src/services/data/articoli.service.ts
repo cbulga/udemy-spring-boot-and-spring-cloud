@@ -52,7 +52,7 @@ export class ArticoliService {
   }
 
   getArticoliByEan = (barcode: string) => {
-    return this.httpClient.get<IArticoli>(`http://${this.server}:${this.port}/api/articoli/cerca/barcode/${barcode}`)
+    return this.httpClient.get<IArticoli>(`http://${this.server}:${this.port}/api/articoli/cerca/ean/${barcode}`)
     .pipe(
       map(response => {
         response.desStatoArt = this.getDesStatoArt(response.idStatoArt)
